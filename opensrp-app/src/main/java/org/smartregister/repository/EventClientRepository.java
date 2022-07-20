@@ -1,5 +1,7 @@
 package org.smartregister.repository;
 
+import static org.smartregister.AllConstants.ROWID;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
@@ -43,10 +45,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import timber.log.Timber;
-
-import static org.smartregister.AllConstants.ROWID;
 
 /**
  * Created by keyman on 27/07/2017.
@@ -247,8 +248,10 @@ public class EventClientRepository extends BaseRepository implements ClientDao, 
     private boolean populateStatement(SQLiteStatement statement, Table table, JSONObject jsonObject, Map<String, Integer> columnOrder) {
         if (statement == null)
             return false;
+
         statement.clearBindings();
         List columns;
+
         try {
             if (table.equals(clientTable)) {
                 columns = Arrays.asList(client_column.values());
@@ -1841,32 +1844,39 @@ public class EventClientRepository extends BaseRepository implements ClientDao, 
         }
     }
 
+    public void markEventsAsSynced(Map<String, Object> syncedEventsClients) {
+        markEventsAsSynced(syncedEventsClients, null, null);
+    }
+
     @SuppressWarnings("unchecked")
-    public void markEventsAsSynced(Map<String, Object> syncedEvents) {
+    public void markEventsAsSynced(Map<String, Object> syncedEventsClients, Set<String> failedEvents, Set<String> failedClients) {
         try {
-            List<JSONObject> clients =
-                    syncedEvents.containsKey(AllConstants.KEY.CLIENTS) ? (List<JSONObject>) syncedEvents.get(
-                            AllConstants.KEY.CLIENTS) : null;
-            List<JSONObject> events =
-                    syncedEvents.containsKey(AllConstants.KEY.EVENTS) ? (List<JSONObject>) syncedEvents.get(
-                            AllConstants.KEY.EVENTS) : null;
+            List<JSONObject> clients = syncedEventsClients.containsKey(AllConstants.KEY.CLIENTS)
+                    ? (List<JSONObject>) syncedEventsClients.get(AllConstants.KEY.CLIENTS)
+                    : null;
+
+            List<JSONObject> events = syncedEventsClients.containsKey(AllConstants.KEY.EVENTS)
+                    ? (List<JSONObject>) syncedEventsClients.get(AllConstants.KEY.EVENTS)
+                    : null;
 
             if (clients != null && !clients.isEmpty()) {
                 for (JSONObject client : clients) {
                     String baseEntityId = client.getString(client_column.baseEntityId.name());
-                    markClientAsSynced(baseEntityId);
+                    if (failedClients == null || !failedClients.contains(baseEntityId))
+                        markClientAsSynced(baseEntityId);
                 }
             }
+
             if (events != null && !events.isEmpty()) {
                 for (JSONObject event : events) {
                     String formSubmissionId = event.getString(event_column.formSubmissionId.name());
-                    markEventAsSynced(formSubmissionId);
+                    if (failedEvents == null || !failedEvents.contains(formSubmissionId))
+                        markEventAsSynced(formSubmissionId);
                 }
             }
         } catch (Exception e) {
             Timber.e(e);
         }
-
     }
 
     @Override

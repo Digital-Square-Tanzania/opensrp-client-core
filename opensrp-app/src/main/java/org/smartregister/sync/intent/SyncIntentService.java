@@ -32,8 +32,10 @@ import org.smartregister.view.activity.DrishtiApplication;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import timber.log.Timber;
 
@@ -42,6 +44,8 @@ public class SyncIntentService extends BaseSyncIntentService {
     protected static final int EVENT_PULL_LIMIT = 2000;
     protected static final int EVENT_PUSH_LIMIT = 50;
     private static final String ADD_URL = "/rest/event/add";
+    private static final String FAILED_CLIENTS = "failed_clients";
+    private static final String FAILED_EVENTS = "failed_events";
     private Context context;
     private HTTPAgent httpAgent;
     private SyncUtils syncUtils;
@@ -241,9 +245,9 @@ public class SyncIntentService extends BaseSyncIntentService {
         int eventsUploadedCount = 0;
 
         while (true) {
-            Map<String, Object> pendingEvents = db.getUnSyncedEvents(EVENT_PUSH_LIMIT);
+            Map<String, Object> pendingEventsClients = db.getUnSyncedEvents(EVENT_PUSH_LIMIT);
 
-            if (pendingEvents.isEmpty()) {
+            if (pendingEventsClients.isEmpty()) {
                 break;
             }
 
@@ -254,16 +258,16 @@ public class SyncIntentService extends BaseSyncIntentService {
             // create request body
             JSONObject request = new JSONObject();
             try {
-                if (pendingEvents.containsKey(AllConstants.KEY.CLIENTS)) {
-                    Object value = pendingEvents.get(AllConstants.KEY.CLIENTS);
+                if (pendingEventsClients.containsKey(AllConstants.KEY.CLIENTS)) {
+                    Object value = pendingEventsClients.get(AllConstants.KEY.CLIENTS);
                     request.put(AllConstants.KEY.CLIENTS, value);
 
                     if (value instanceof List) {
                         eventsUploadedCount += ((List) value).size();
                     }
                 }
-                if (pendingEvents.containsKey(AllConstants.KEY.EVENTS)) {
-                    request.put(AllConstants.KEY.EVENTS, pendingEvents.get(AllConstants.KEY.EVENTS));
+                if (pendingEventsClients.containsKey(AllConstants.KEY.EVENTS)) {
+                    request.put(AllConstants.KEY.EVENTS, pendingEventsClients.get(AllConstants.KEY.EVENTS));
                 }
             } catch (JSONException e) {
                 Timber.e(e);
@@ -274,16 +278,59 @@ public class SyncIntentService extends BaseSyncIntentService {
                             baseUrl,
                             ADD_URL),
                     jsonPayload);
+
             if (response.isFailure()) {
                 Timber.e("Events sync failed.");
                 isSuccessfulPushSync = false;
+            } else {
+                // do not mark items in list of failed events/clients as synced
+                Set<String> failedClients = null;
+                Set<String> failedEvents = null;
+
+                String responseData = response.payload();
+                if (StringUtils.isNotEmpty(responseData)) {
+                    try {
+                        JSONObject failedEventClients = new JSONObject(responseData);
+                        failedClients = getFailed(FAILED_CLIENTS, failedEventClients);
+                        failedEvents = getFailed(FAILED_EVENTS, failedEventClients);
+                    } catch (JSONException e) {
+                        Timber.e(e);
+                    }
+                }
+
+                db.markEventsAsSynced(pendingEventsClients, failedEvents, failedClients);
+
+                Timber.i("Events synced successfully.");
+
+                updateProgress(eventsUploadedCount, totalEventCount);
+
+                if ((totalEventCount - eventsUploadedCount) > 0)
+                    pushECToServer(db);
+
+                break;
             }
-            db.markEventsAsSynced(pendingEvents);
-            Timber.i("Events synced successfully.");
-            updateProgress(eventsUploadedCount, totalEventCount);
         }
 
         return isSuccessfulPushSync;
+    }
+
+    private Set<String> getFailed(String recordType, JSONObject failedEventClients) {
+        Set<String> set = null;
+
+        try {
+            JSONArray failed = failedEventClients.getJSONArray(recordType);
+
+            if (failed.length() > 0) {
+                set = new HashSet<>();
+                for (int i = 0; i < failed.length(); i++) {
+                    set.add(failed.getString(i));
+                }
+            }
+        } catch (JSONException e) {
+            Timber.e(e);
+        }
+
+        return set;
     }
 
     private void sendSyncStatusBroadcastMessage(FetchStatus fetchStatus) {
@@ -395,4 +442,7 @@ public class SyncIntentService extends BaseSyncIntentService {
         return baseUrl;
     }
 
+    protected Integer getEventBatchSize() {
+        return EVENT_PUSH_LIMIT;
+    }
 }
