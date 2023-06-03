@@ -27,6 +27,7 @@ import static org.smartregister.AllConstants.SERVER_TIMEZONE;
 import static org.smartregister.AllConstants.TEAM_ROLE;
 import static org.smartregister.AllConstants.TEAM_ROLE_IDENTIFIER;
 import static org.smartregister.AllConstants.USER_LOCALITY_ID_PREFIX;
+import static org.smartregister.AllConstants.CURRENT_LOCATION_ID;
 import static org.smartregister.AllConstants.USER_LOCATION_TAG;
 import static org.smartregister.util.Log.logError;
 import static org.smartregister.util.Log.logInfo;
@@ -122,6 +123,8 @@ public class AllSharedPreferences {
     public void saveUserLocalityId(String username, String localityId) {
         if (username != null) {
             preferences.edit().putString(USER_LOCALITY_ID_PREFIX + username, localityId)
+                    .commit();
+            preferences.edit().putString(CURRENT_LOCATION_ID, localityId)
                     .commit();
         }
     }
