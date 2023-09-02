@@ -1,5 +1,15 @@
 package org.smartregister.service;
 
+import static org.smartregister.AllConstants.ENGLISH_LANGUAGE;
+import static org.smartregister.AllConstants.ENGLISH_LOCALE;
+import static org.smartregister.AllConstants.KANNADA_LANGUAGE;
+import static org.smartregister.AllConstants.KANNADA_LOCALE;
+import static org.smartregister.AllConstants.OPENSRP_AUTH_USER_URL_PATH;
+import static org.smartregister.AllConstants.OPENSRP_LOCATION_URL_PATH;
+import static org.smartregister.AllConstants.OPERATIONAL_AREAS;
+import static org.smartregister.AllConstants.ORGANIZATION_IDS;
+import static org.smartregister.event.Event.ON_LOGOUT;
+
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
@@ -19,6 +29,7 @@ import org.smartregister.domain.jsonmapping.Time;
 import org.smartregister.domain.jsonmapping.User;
 import org.smartregister.domain.jsonmapping.util.LocationTree;
 import org.smartregister.domain.jsonmapping.util.TeamLocation;
+import org.smartregister.domain.jsonmapping.util.TeamLocationAttribute;
 import org.smartregister.domain.jsonmapping.util.TeamLocationTag;
 import org.smartregister.domain.jsonmapping.util.TeamMember;
 import org.smartregister.repository.AllSettings;
@@ -55,16 +66,6 @@ import javax.crypto.CipherOutputStream;
 import javax.security.auth.x500.X500Principal;
 
 import timber.log.Timber;
-
-import static org.smartregister.AllConstants.ENGLISH_LANGUAGE;
-import static org.smartregister.AllConstants.ENGLISH_LOCALE;
-import static org.smartregister.AllConstants.KANNADA_LANGUAGE;
-import static org.smartregister.AllConstants.KANNADA_LOCALE;
-import static org.smartregister.AllConstants.OPENSRP_AUTH_USER_URL_PATH;
-import static org.smartregister.AllConstants.OPENSRP_LOCATION_URL_PATH;
-import static org.smartregister.AllConstants.OPERATIONAL_AREAS;
-import static org.smartregister.AllConstants.ORGANIZATION_IDS;
-import static org.smartregister.event.Event.ON_LOGOUT;
 
 public class UserService {
     private static final String KEYSTORE = "AndroidKeyStore";
@@ -143,7 +144,7 @@ public class UserService {
             this.keyStore = KeyStore.getInstance(KEYSTORE);
             this.keyStore.load(null);
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException |
-                CertificateException e) {
+                 CertificateException e) {
             Timber.e(e);
         }
     }
@@ -376,6 +377,7 @@ public class UserService {
         saveDefaultLocationName(getUserDefaultLocationName(userInfo));
         saveUserLocationId(username, getUserLocationId(userInfo));
         saveUserLocationTag(getUserLocationTag(userInfo));
+        saveUserLocationAttribute(getUserLocationAttribute(userInfo));
         saveDefaultTeam(username, getUserDefaultTeam(userInfo));
         saveDefaultTeamId(username, getUserDefaultTeamId(userInfo));
         saveTeamRole(getUserTeamRole(userInfo));
@@ -566,6 +568,26 @@ public class UserService {
         return null;
     }
 
+    public String getUserLocationAttribute(LoginResponseData userInfo) {
+        try {
+            if (userInfo != null && userInfo.team != null && userInfo.team.locations != null && !userInfo.team.locations.isEmpty()) {
+                for (TeamLocation teamLocation : userInfo.team.locations) {
+                    if (teamLocation != null) {
+                        StringBuilder attributes = new StringBuilder();
+                        for (TeamLocationAttribute locationAttribute : teamLocation.attributes) {
+                            attributes.append(locationAttribute.display).append(", ");
+                        }
+                        String trimmedString = attributes.toString().trim();
+                        return trimmedString.substring(0, trimmedString.length() - 1);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
     public void saveUserLocationId(String userName, String locationId) {
         if (userName != null) {
             allSharedPreferences.saveUserLocalityId(userName, locationId);
@@ -574,6 +596,10 @@ public class UserService {
 
     public void saveUserLocationTag(String locationTag) {
         allSharedPreferences.saveUserLocationTag(locationTag);
+    }
+
+    public void saveUserLocationAttribute(String locationAttribute) {
+        allSharedPreferences.saveUserLocationAttribute(locationAttribute);
     }
 
     public void saveAnmLocation(LocationTree anmLocation) {

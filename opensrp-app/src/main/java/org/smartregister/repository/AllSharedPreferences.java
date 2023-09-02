@@ -28,6 +28,7 @@ import static org.smartregister.AllConstants.TEAM_ROLE;
 import static org.smartregister.AllConstants.TEAM_ROLE_IDENTIFIER;
 import static org.smartregister.AllConstants.USER_LOCALITY_ID_PREFIX;
 import static org.smartregister.AllConstants.CURRENT_LOCATION_ID;
+import static org.smartregister.AllConstants.USER_LOCATION_ATTRIBUTE;
 import static org.smartregister.AllConstants.USER_LOCATION_TAG;
 import static org.smartregister.util.Log.logError;
 import static org.smartregister.util.Log.logInfo;
@@ -139,6 +140,13 @@ public class AllSharedPreferences {
     public void saveUserLocationTag(String locationTag) {
         if (locationTag != null) {
             preferences.edit().putString(USER_LOCATION_TAG, locationTag)
+                    .commit();
+        }
+    }
+
+    public void saveUserLocationAttribute(String locationAttribute) {
+        if (locationAttribute != null) {
+            preferences.edit().putString(USER_LOCATION_ATTRIBUTE, locationAttribute)
                     .commit();
         }
     }

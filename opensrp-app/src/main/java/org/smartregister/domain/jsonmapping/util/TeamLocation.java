@@ -11,4 +11,7 @@ public class TeamLocation {
     public String display;
 
     public Set<TeamLocationTag> tags;
+
+
+    public Set<TeamLocationAttribute> attributes;
 }
