@@ -1,15 +1,7 @@
 package org.smartregister.repository;
 
-import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import static org.smartregister.AllConstants.CURRENT_LOCALITY;
+import static org.smartregister.AllConstants.CURRENT_LOCATION_ID;
 import static org.smartregister.AllConstants.DEFAULT_LOCALE;
 import static org.smartregister.AllConstants.DEFAULT_LOCALITY_ID_PREFIX;
 import static org.smartregister.AllConstants.DEFAULT_LOCALITY_NAME;
@@ -27,11 +19,19 @@ import static org.smartregister.AllConstants.SERVER_TIMEZONE;
 import static org.smartregister.AllConstants.TEAM_ROLE;
 import static org.smartregister.AllConstants.TEAM_ROLE_IDENTIFIER;
 import static org.smartregister.AllConstants.USER_LOCALITY_ID_PREFIX;
-import static org.smartregister.AllConstants.CURRENT_LOCATION_ID;
 import static org.smartregister.AllConstants.USER_LOCATION_ATTRIBUTE;
 import static org.smartregister.AllConstants.USER_LOCATION_TAG;
 import static org.smartregister.util.Log.logError;
 import static org.smartregister.util.Log.logInfo;
+
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class AllSharedPreferences {
     public static final String ANM_IDENTIFIER_PREFERENCE_KEY = "anmIdentifier";
@@ -149,6 +149,10 @@ public class AllSharedPreferences {
             preferences.edit().putString(USER_LOCATION_ATTRIBUTE, locationAttribute)
                     .commit();
         }
+    }
+
+    public String fetchUserLocationAttribute() {
+        return preferences.getString(USER_LOCATION_ATTRIBUTE, null);
     }
 
     public String fetchUserLocationTag() {
