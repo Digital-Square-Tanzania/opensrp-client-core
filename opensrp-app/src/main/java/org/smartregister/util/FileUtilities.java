@@ -98,7 +98,7 @@ public class FileUtilities {
     public static String getImageUrl(String entityID) {
         String baseUrl = CoreLibrary.getInstance().context().allSharedPreferences().fetchBaseURL("");
         baseUrl = StringUtils.isNotBlank(baseUrl) && baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
-        return format("{0}/{1}/{2}", baseUrl, AllConstants.PROFILE_IMAGES_DOWNLOAD_PATH, entityID);
+        return format("{0}{1}/{2}", baseUrl, AllConstants.PROFILE_IMAGES_DOWNLOAD_PATH, entityID);
     }
 
     public void write(String fileName, String data) {
@@ -115,14 +115,9 @@ public class FileUtilities {
             File outputFile = new File(outDir, fileName);
             writer = new BufferedWriter(new FileWriter(outputFile));
             writer.write(data);
-//            Toast.makeText(context.getApplicationContext(),
-//                    "Report successfully saved to: " + outputFile.getAbsolutePath(),
-//                    Toast.LENGTH_LONG).show();
             writer.close();
         } catch (IOException e) {
             Timber.w(e);
-//            Toast.makeText(context, e.getMessage() + " Unable to write to external storage.",
-//                    Toast.LENGTH_LONG).show();
         }
 
     }

@@ -156,13 +156,8 @@ public class OpenSRPImageLoader extends ImageLoader {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             HurlStack stack = new HurlStack() {
                 @Override
-                public HttpResponse performRequest(Request<?> request, Map<String, String>
-                        headers) throws IOException, AuthFailureError {
-
-                    headers.putAll(
-                            CoreLibrary.getInstance().context().allSettings().getAuthParams());
-
-                    return super.performRequest(request, headers);
+                public com.android.volley.toolbox.HttpResponse executeRequest(Request<?> request, Map<String, String> additionalHeaders) throws IOException, AuthFailureError {
+                    return super.executeRequest(request, CoreLibrary.getInstance().context().allSettings().getAuthParams());
                 }
             };
 
