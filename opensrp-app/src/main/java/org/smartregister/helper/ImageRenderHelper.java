@@ -8,6 +8,8 @@ import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
 import org.apache.commons.lang3.StringUtils;
+import org.smartregister.CoreLibrary;
+import org.smartregister.SyncConfiguration;
 import org.smartregister.domain.Photo;
 import org.smartregister.util.ImageUtils;
 import org.smartregister.util.OpenSRPImageLoader;
@@ -47,7 +49,12 @@ public class ImageRenderHelper {
 
         }
         profileImageView.setTag(org.smartregister.R.id.entity_id, clientBaseEntityId);
-        DrishtiApplication.getCachedImageLoaderInstance().getImageByClientId(clientBaseEntityId, OpenSRPImageLoader.getStaticImageListener(profileImageView, 0, 0));
+
+        SyncConfiguration syncConfiguration = CoreLibrary.getInstance().getSyncConfiguration();
+
+        if (syncConfiguration.isClientProfileImageSyncEnabled()) {
+            DrishtiApplication.getCachedImageLoaderInstance().getImageByClientId(clientBaseEntityId, OpenSRPImageLoader.getStaticImageListener(profileImageView, 0, 0));
+        }
 
     }
 }

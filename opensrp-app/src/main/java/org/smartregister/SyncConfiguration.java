@@ -168,6 +168,15 @@ public abstract class SyncConfiguration {
 
     public abstract String getTopAllowedLocationLevel();
 
+    /**
+     * Determines if synchronization of client profile images from the server is enabled or disabled.
+     * Some implementations may not use synchronization of client profile images.
+     * @return boolean indicating whether the feature is enabled or not
+     */
+    public  boolean isClientProfileImageSyncEnabled(){
+        return false;
+    }
+
     public boolean clearDataOnNewTeamLogin() {
         return false;
     }

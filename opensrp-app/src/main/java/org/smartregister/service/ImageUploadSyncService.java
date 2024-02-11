@@ -1,5 +1,8 @@
 package org.smartregister.service;
 
+import static org.smartregister.util.Log.logError;
+import static org.smartregister.util.Log.logInfo;
+
 import android.app.IntentService;
 import android.content.Intent;
 
@@ -10,9 +13,6 @@ import org.smartregister.domain.ProfileImage;
 import org.smartregister.repository.ImageRepository;
 
 import java.util.List;
-
-import static org.smartregister.util.Log.logError;
-import static org.smartregister.util.Log.logInfo;
 
 /**
  * Created by Raihan Ahmed on 10/14/15.
@@ -33,21 +33,23 @@ public class ImageUploadSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        try {
-            List<ProfileImage> profileImages = imageRepo.findAllUnSynced();
-            String baseUrl = CoreLibrary.getInstance().context().configuration().dristhiBaseURL();
-            baseUrl = StringUtils.isNotBlank(baseUrl) && baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        if (CoreLibrary.getInstance().getSyncConfiguration().isClientProfileImageSyncEnabled()) {
+            try {
+                List<ProfileImage> profileImages = imageRepo.findAllUnSynced();
+                String baseUrl = CoreLibrary.getInstance().context().configuration().dristhiBaseURL();
+                baseUrl = StringUtils.isNotBlank(baseUrl) && baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
 
-            for (int i = 0; i < profileImages.size(); i++) {
-                String response = CoreLibrary.getInstance().context().getHttpAgent().httpImagePost(
-                        baseUrl
-                                + AllConstants.PROFILE_IMAGES_UPLOAD_PATH, profileImages.get(i));
-                if (response.contains("success")) {
-                    imageRepo.close(profileImages.get(i).getImageid());
+                for (int i = 0; i < profileImages.size(); i++) {
+                    String response = CoreLibrary.getInstance().context().getHttpAgent().httpImagePost(
+                            baseUrl
+                                    + AllConstants.PROFILE_IMAGES_UPLOAD_PATH, profileImages.get(i));
+                    if (response.contains("success")) {
+                        imageRepo.close(profileImages.get(i).getImageid());
+                    }
                 }
+            } catch (Exception e) {
+                logError(TAG, e.getMessage());
             }
-        } catch (Exception e) {
-            logError(TAG, e.getMessage());
         }
     }
 
