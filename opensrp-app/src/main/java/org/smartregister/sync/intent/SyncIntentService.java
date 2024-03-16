@@ -18,6 +18,7 @@ import org.smartregister.R;
 import org.smartregister.SyncConfiguration;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.domain.Response;
+import org.smartregister.domain.ResponseStatus;
 import org.smartregister.domain.SyncEntity;
 import org.smartregister.domain.SyncProgress;
 import org.smartregister.domain.db.EventClient;
@@ -181,7 +182,9 @@ public class SyncIntentService extends BaseSyncIntentService {
     private void processFetchedEvents(Response resp, ECSyncHelper ecSyncUpdater, final int count) throws JSONException {
         int eCount;
         JSONObject jsonObject = new JSONObject();
-        if (resp.payload() == null) {
+        if (resp.status() == ResponseStatus.failure) {
+            eCount = -1;
+        } else if (resp.payload() == null) {
             eCount = 0;
         } else {
             jsonObject = new JSONObject((String) resp.payload());
@@ -244,7 +247,7 @@ public class SyncIntentService extends BaseSyncIntentService {
         int totalEventCount = db.getUnSyncedEventsCount();
         int eventsUploadedCount = 0;
 
-        while (true) {
+        for (int i = 0; i < syncUtils.getNumOfSyncAttempts(); i++) {
             Map<String, Object> pendingEventsClients = db.getUnSyncedEvents(EVENT_PUSH_LIMIT);
 
             if (pendingEventsClients.isEmpty()) {
