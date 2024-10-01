@@ -13,8 +13,9 @@ import static org.smartregister.event.Event.ON_LOGOUT;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
-import android.support.annotation.VisibleForTesting;
 import android.util.Base64;
+
+import androidx.annotation.VisibleForTesting;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.CoreLibrary;

@@ -1,9 +1,10 @@
 package org.smartregister.view.viewpager;
 
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * Created by Geoffrey Koros on 9/12/2015.
