@@ -2,7 +2,7 @@ package org.smartregister.util;
 
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,14 +26,17 @@ public class CrashLyticsTree extends Timber.Tree {
             userName = DrishtiApplication.getInstance().getUsername();
         }
 
-        Crashlytics.setInt(CRASHLYTICS_KEY_PRIORITY, priority);
-        Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
-        Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
-        Crashlytics.setUserName(userName);
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+
+        crashlytics.setCustomKey(CRASHLYTICS_KEY_PRIORITY, priority);
+        crashlytics.setCustomKey(CRASHLYTICS_KEY_TAG, tag != null ? tag : "N/A");
+        crashlytics.setCustomKey(CRASHLYTICS_KEY_MESSAGE, message);
+
+        crashlytics.setUserId(userName);
         if (t == null) {
-            Crashlytics.logException(new Exception(message));
+            crashlytics.recordException(new Exception(message));
         } else {
-            Crashlytics.logException(t);
+            crashlytics.recordException(t);
         }
     }
 }
