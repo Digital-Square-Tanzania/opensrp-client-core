@@ -11,6 +11,11 @@ buildscript {
     }
 }
 
+def githubProperties = new Properties()
+if (rootProject.file("github.properties").exists()) {
+    githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+}
+
 repositories {
     google()
     jcenter()
@@ -18,6 +23,17 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     mavenLocal()
     maven { url 'https://maven.fabric.io/public' }
+    maven {
+
+        name = "GitHubPackages"
+
+        url = uri("https://maven.pkg.github.com/Digital-Square-Tanzania/android-p2p-sync")
+        credentials {
+            username = githubProperties['gpr.usr'] ?: System.getenv("GITHUB_ACTOR")
+            password = githubProperties['gpr.key'] ?: System.getenv("GITHUB_TOKEN")
+        }
+
+    }
 }
 
 apply plugin: 'com.android.application'
