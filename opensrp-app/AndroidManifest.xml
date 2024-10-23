@@ -12,7 +12,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
@@ -81,13 +85,16 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
-        <receiver android:name=".view.receiver.SyncBroadcastReceiver" />
-        <receiver android:name=".view.receiver.ConnectivityChangeReceiver">
+        <receiver android:name=".view.receiver.SyncBroadcastReceiver"
+            android:exported="false" />
+        <receiver android:name=".view.receiver.ConnectivityChangeReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".view.receiver.TimeChangedBroadcastReceiver">
+        <receiver android:name=".view.receiver.TimeChangedBroadcastReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />

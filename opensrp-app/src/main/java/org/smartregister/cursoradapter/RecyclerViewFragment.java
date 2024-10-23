@@ -4,12 +4,6 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -47,6 +41,13 @@ import timber.log.Timber;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static org.smartregister.AllConstants.SHORT_DATE_FORMAT;
+
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.loader.app.LoaderManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by keyman on 09/07/18.
