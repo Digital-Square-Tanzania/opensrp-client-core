@@ -7,10 +7,14 @@ import org.json.JSONException;
 import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
+import org.smartregister.job.BaseWorker;
 import org.smartregister.job.SyncServiceJob;
 import org.smartregister.sync.helper.SyncSettingsServiceHelper;
+import org.smartregister.worker.SyncServiceWorker;
 
 import static org.smartregister.util.Log.logError;
+
+import androidx.work.Data;
 
 /**
  * Created by ndegwamartin on 14/09/2018.
@@ -32,7 +36,18 @@ public class SettingsSyncIntentService extends BaseSyncIntentService {
     protected void onHandleIntent(Intent intent) {
         boolean isSuccessfulSync = processSettings(intent);
         if (isSuccessfulSync) {
-            SyncServiceJob.scheduleJobImmediately(SyncServiceJob.TAG);
+            // Build the input data with the dynamic service class name
+            Data inputData = new Data.Builder()
+                    .putString("serviceClassName", "org.smartregister.sync.intent.SyncIntentService") // fully qualified class name
+                    .putBoolean(AllConstants.INTENT_KEY.TO_RESCHEDULE, false) // if needed
+                    .build();
+
+            BaseWorker.scheduleJobImmediately(
+                    this,
+                    SyncServiceWorker.TAG,
+                    SyncServiceWorker.class,
+                    inputData
+            );
         }
     }
 

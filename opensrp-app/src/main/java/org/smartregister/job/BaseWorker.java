@@ -174,6 +174,35 @@ public abstract class BaseWorker extends Worker {
                 jobTag, repeatIntervalMinutes, flexIntervalMinutes);
     }
 
+    public static void scheduleJob(@NonNull Context context,
+                                   @NonNull String jobTag,
+                                   long repeatIntervalMinutes,
+                                   long flexIntervalMinutes,
+                                   @NonNull Class<? extends Worker> workerClass,
+                                   @NonNull Data inputData) {
+        if (repeatIntervalMinutes < 15) {
+            Timber.w("Provided repeatIntervalMinutes (%d) is less than the minimum allowed. Adjusting to 15 minutes.", repeatIntervalMinutes);
+            repeatIntervalMinutes = 15;
+        }
+
+        // Combine your custom inputData with any required defaults (if needed)
+        Data combinedData = new Data.Builder()
+                .putAll(inputData)
+                .build();
+
+        PeriodicWorkRequest periodicWorkRequest =
+                new PeriodicWorkRequest.Builder(workerClass, repeatIntervalMinutes, TimeUnit.MINUTES,
+                        flexIntervalMinutes, TimeUnit.MINUTES)
+                        .setInputData(combinedData)
+                        .build();
+
+        WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(jobTag, ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest);
+
+        Timber.d("Scheduled periodic job with tag '%s': every %d minutes with a flex interval of %d minutes",
+                jobTag, repeatIntervalMinutes, flexIntervalMinutes);
+    }
+
     /**
      * Schedules one-time immediate work using WorkManager.
      *
@@ -190,8 +219,23 @@ public abstract class BaseWorker extends Worker {
 
         // Enqueue unique one-time work with the KEEP policy.
         WorkManager.getInstance(context)
-                .enqueueUniqueWork(jobTag, ExistingWorkPolicy.KEEP, oneTimeWorkRequest);
+                .enqueueUniqueWork(jobTag+"-Immediate", ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
 
-        Timber.d("Scheduled immediate job with tag '%s'", jobTag);
+        Timber.d("Scheduled immediate job with tag '%s'", jobTag+"-Immediate");
+    }
+
+    public static void scheduleJobImmediately(@NonNull Context context,
+                                              @NonNull String jobTag,
+                                              @NonNull Class<? extends Worker> workerClass,
+                                              @NonNull Data inputData) {
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(workerClass)
+                        .setInputData(inputData)
+                        .build();
+
+        WorkManager.getInstance(context)
+                .enqueueUniqueWork(jobTag+"-Immediate", ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+
+        Timber.d("Scheduling immediate job with tag '%s'", jobTag+"-Immediate");
     }
 }
