@@ -281,6 +281,9 @@ dependencies {
     }
 
     implementation 'com.evernote:android-job:1.4.3'
+//    implementation 'com.evernote:android-job:1.2.6'
+    implementation "androidx.work:work-runtime:2.8.1"
+
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.6'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
