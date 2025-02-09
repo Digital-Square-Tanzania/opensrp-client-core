@@ -1,10 +1,10 @@
 package org.smartregister.repository;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteException;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteDatabaseHook;
-import net.sqlcipher.database.SQLiteException;
 import net.sqlcipher.database.SQLiteOpenHelper;
 
 import org.apache.commons.lang3.StringUtils;

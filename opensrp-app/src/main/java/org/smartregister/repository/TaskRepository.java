@@ -8,7 +8,6 @@ import com.ibm.fhir.model.resource.QuestionnaireResponse;
 import com.ibm.fhir.path.FHIRPathElementNode;
 
 import net.sqlcipher.Cursor;
-import net.sqlcipher.SQLException;
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteStatement;
 
@@ -29,6 +28,7 @@ import org.smartregister.sync.helper.TaskServiceHelper;
 import org.smartregister.util.DateUtil;
 import org.smartregister.util.P2PUtil;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -391,7 +391,7 @@ public class TaskRepository extends BaseRepository implements TaskDao {
             getWritableDatabase().setTransactionSuccessful();
             getWritableDatabase().endTransaction();
             return true;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Timber.e(e);
             getWritableDatabase().endTransaction();
             return false;
@@ -433,7 +433,7 @@ public class TaskRepository extends BaseRepository implements TaskDao {
             getWritableDatabase().endTransaction();
             return true;
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Timber.e(e);
             getWritableDatabase().endTransaction();
             return false;
