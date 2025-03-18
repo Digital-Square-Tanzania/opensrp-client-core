@@ -222,22 +222,53 @@ public class JsonFormUtils {
     }
 
     private static void addMultiSelectListObservations(@NonNull Event event, @NonNull JSONObject jsonObject) {
-        JSONArray valuesJsonArray;
-        try {
-            valuesJsonArray = new JSONArray(jsonObject.optString(VALUE));
-            for (int i = 0; i < valuesJsonArray.length(); i++) {
-                JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
-                String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
-                String fieldCode = jsonObject.optString(OPENMRS_ENTITY_ID);
-                String parentCode = jsonObject.optString(OPENMRS_ENTITY_PARENT);
-                String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
-                String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
-                String formSubmissionField = jsonObject.optString(KEY);
-                event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
-                        Collections.singletonList(humanReadableValues), "", formSubmissionField));
+
+       boolean saveObsAsArray =  jsonObject.optBoolean(SAVE_OBS_AS_ARRAY);
+
+        if(!saveObsAsArray) {
+            JSONArray valuesJsonArray;
+            try {
+                valuesJsonArray = new JSONArray(jsonObject.optString(VALUE));
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
+                    String fieldType = jsonValObject.optString(OPENMRS_ENTITY);
+                    String fieldCode = jsonObject.optString(OPENMRS_ENTITY_ID);
+                    String parentCode = jsonObject.optString(OPENMRS_ENTITY_PARENT);
+                    String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
+                    String humanReadableValues = jsonValObject.optString(AllConstants.TEXT);
+                    String formSubmissionField = jsonObject.optString(KEY);
+                    event.addObs(new Obs(fieldType, AllConstants.TEXT, fieldCode, parentCode, Collections.singletonList(value),
+                            Collections.singletonList(humanReadableValues), "", formSubmissionField));
+                }
+            } catch (JSONException e) {
+                Timber.e(e);
             }
-        } catch (JSONException e) {
-            Timber.e(e);
+        }else{
+            JSONArray valuesJsonArray;
+            List<Object> values = new ArrayList<>();
+            List<Object> humanReadableValues = new ArrayList<>();
+
+            String fieldType = jsonObject.optString(OPENMRS_ENTITY);
+            String fieldCode = jsonObject.optString(OPENMRS_ENTITY_ID);
+            String parentCode = jsonObject.optString(OPENMRS_ENTITY_PARENT);
+            String formSubmissionField = jsonObject.optString(KEY);
+
+            try {
+                valuesJsonArray = new JSONArray(jsonObject.optString(VALUE));
+                for (int i = 0; i < valuesJsonArray.length(); i++) {
+                    JSONObject jsonValObject = valuesJsonArray.optJSONObject(i);
+
+                    String value = jsonValObject.optString(OPENMRS_ENTITY_ID);
+                    String humanReadableValue = jsonValObject.optString(AllConstants.TEXT);
+
+                    values.add(value);
+                    humanReadableValues.add(humanReadableValue);
+                }
+                event.addObs(new Obs(fieldType, AllConstants.MULTI_SELECT_LIST, fieldCode, parentCode, values,
+                        humanReadableValues, "", formSubmissionField));
+            } catch (JSONException e) {
+                Timber.e(e);
+            }
         }
     }
 
