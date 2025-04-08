@@ -83,7 +83,9 @@ public abstract class BaseLoginInteractor implements BaseLoginContract.Interacto
         boolean isAuthenticated = getUserService().isUserInValidGroup(userName, password);
         if (!isAuthenticated) {
 
-            getLoginView().showErrorDialog(getApplicationContext().getResources().getString(R.string.unauthorized));
+            //getLoginView().showErrorDialog(getApplicationContext().getResources().getString(R.string.unauthorized));
+            //If Login failed with local Login then try login in remotely
+            loginWithLocalFlag(view, false, userName, password);
 
         } else if (isAuthenticated && (!AllConstants.TIME_CHECK || TimeStatus.OK.equals(getUserService().validateStoredServerTimeZone()))) {
 
