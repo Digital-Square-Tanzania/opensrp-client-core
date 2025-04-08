@@ -72,10 +72,17 @@ public class RemoteLoginTask extends AsyncTask<Void, Integer, LoginResponse> {
     protected void onPostExecute(final LoginResponse loginResponse) {
         super.onPostExecute(loginResponse);
         afterLoginCheck.onEvent(loginResponse);
+        mLoginView.showProgress(false);
     }
 
     @Override
     protected void onCancelled() {
+        mLoginView.showProgress(false);
+    }
+
+    @Override
+    protected void onCancelled(LoginResponse loginResponse) {
+        super.onCancelled(loginResponse);
         mLoginView.showProgress(false);
     }
 
