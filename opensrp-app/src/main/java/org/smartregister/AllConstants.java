@@ -30,6 +30,7 @@ public class AllConstants {
     public static final String DEFAULT_TEAM_PREFIX = "dfltTeam-";
     public static final String DEFAULT_TEAM_ID_PREFIX = "dfltTeamId-";
     public static final String USER_LOCALITY_ID_PREFIX = "userLoc-";
+    public static final String USER_LOCALITY_NAME_PREFIX = "userLocName-";
     public static final String USER_LOCATION_TAG = "userLocTag";
 
     public static final String USER_LOCATION_ATTRIBUTE = "userLocAttribute";

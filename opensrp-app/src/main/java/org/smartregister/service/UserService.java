@@ -377,6 +377,7 @@ public class UserService {
         saveDefaultLocationId(username, getUserDefaultLocationId(userInfo));
         saveDefaultLocationName(getUserDefaultLocationName(userInfo));
         saveUserLocationId(username, getUserLocationId(userInfo));
+        saveUserLocationName(username, getUserLocationName(userInfo));
         saveUserLocationTag(getUserLocationTag(userInfo));
         saveUserLocationAttribute(getUserLocationAttribute(userInfo));
         saveDefaultTeam(username, getUserDefaultTeam(userInfo));
@@ -549,6 +550,21 @@ public class UserService {
         return null;
     }
 
+    public String getUserLocationName(LoginResponseData userInfo) {
+        try {
+            if (userInfo != null && userInfo.team != null && userInfo.team.locations != null && !userInfo.team.locations.isEmpty()) {
+                for (TeamLocation teamLocation : userInfo.team.locations) {
+                    if (teamLocation != null) {
+                        return teamLocation.name;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
     public String getUserLocationTag(LoginResponseData userInfo) {
         try {
             if (userInfo != null && userInfo.team != null && userInfo.team.locations != null && !userInfo.team.locations.isEmpty()) {
@@ -592,6 +608,12 @@ public class UserService {
     public void saveUserLocationId(String userName, String locationId) {
         if (userName != null) {
             allSharedPreferences.saveUserLocalityId(userName, locationId);
+        }
+    }
+
+    public void saveUserLocationName(String userName, String locationName) {
+        if (userName != null) {
+            allSharedPreferences.saveUserLocalityName(userName, locationName);
         }
     }
 
