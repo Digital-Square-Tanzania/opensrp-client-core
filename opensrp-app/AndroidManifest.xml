@@ -63,20 +63,16 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".view.activity.FormActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="portrait" />
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.MicroFormActivity"
-            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"
-            android:screenOrientation="landscape" />
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" />
         <activity
             android:name=".view.activity.NativeECSmartRegisterActivity"
-            android:screenOrientation="landscape"
             android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.BarcodeScanActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait" />
+            android:configChanges="keyboardHidden|orientation" />
 
         <activity
             android:name=".view.activity.NativeHomeActivity"
@@ -84,8 +80,7 @@
 
         <activity
             android:name=".view.activity.SettingsActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+            android:launchMode="singleTask" />
 
         <receiver android:name=".view.receiver.SyncBroadcastReceiver"
             android:exported="false" />
