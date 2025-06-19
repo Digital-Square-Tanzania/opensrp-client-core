@@ -38,7 +38,7 @@ public class ProviderRepository extends BaseRepository {
             "CREATE TABLE " + PROVIDER_TABLE + " (" +
             ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             OPENMRS_UUID + " VARCHAR," +
-            USERNAME + " VARCHAR," +
+            USERNAME + " VARCHAR UNIQUE," +
             FIRST_NAME + " VARCHAR," +
             MIDDLE_NAME + " VARCHAR," +
             LAST_NAME + " VARCHAR," +
