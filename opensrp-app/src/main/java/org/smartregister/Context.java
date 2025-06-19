@@ -36,6 +36,7 @@ import org.smartregister.repository.LocationTagRepository;
 import org.smartregister.repository.ManifestRepository;
 import org.smartregister.repository.MotherRepository;
 import org.smartregister.repository.PlanDefinitionRepository;
+import org.smartregister.repository.ProviderRepository;
 import org.smartregister.repository.ReportRepository;
 import org.smartregister.repository.ServiceProvidedRepository;
 import org.smartregister.repository.SettingsRepository;
@@ -219,6 +220,7 @@ public class Context {
     private AppProperties appProperties;
     private LocationTagRepository locationTagRepository;
     private ManifestRepository manifestRepository;
+    private ProviderRepository providerRepository;
     private ClientFormRepository clientFormRepository;
 
     /////////////////////////////////////////////////
@@ -1180,6 +1182,13 @@ public class Context {
             manifestRepository = new ManifestRepository();
         }
         return manifestRepository;
+    }
+
+    public ProviderRepository getProviderRepository() {
+        if (providerRepository == null) {
+            providerRepository = new ProviderRepository();
+        }
+        return providerRepository;
     }
 
     public ClientFormRepository getClientFormRepository() {
