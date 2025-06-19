@@ -88,7 +88,7 @@ public class ProvidersSyncIntentService extends BaseSyncIntentService {
                 complete(FetchStatus.fetchedFailed);
                 return;
             }
-            JSONArray teamMembers = new JSONArray((String) resp.payload());
+            JSONArray teamMembers = new JSONObject((String) resp.payload()).getJSONArray("data");
             ProviderRepository providerRepository = CoreLibrary.getInstance().context().getProviderRepository();
             int savedCount = 0;
             for (int i = 0; i < teamMembers.length(); i++) {
