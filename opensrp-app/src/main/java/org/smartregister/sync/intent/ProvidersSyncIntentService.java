@@ -71,7 +71,10 @@ public class ProvidersSyncIntentService extends BaseSyncIntentService {
                 complete(FetchStatus.fetchedFailed);
                 return;
             }
-           String baseUrl = android.net.Uri.parse(getFormattedBaseUrl()).getHost();
+            String formattedBaseUrl = getFormattedBaseUrl();
+            String scheme = android.net.Uri.parse(formattedBaseUrl).getScheme();
+            String host = android.net.Uri.parse(formattedBaseUrl).getHost();
+            String baseUrl = scheme + "://" + host;
             String url = baseUrl + String.format(PROVIDERS_URL_PATTERN, teamId);
             Timber.i("Fetching providers from url: %s", url);
             if (httpAgent == null) {
