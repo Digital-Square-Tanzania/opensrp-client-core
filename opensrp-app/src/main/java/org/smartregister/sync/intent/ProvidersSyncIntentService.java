@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
@@ -16,7 +15,6 @@ import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.ProviderRepository;
 import org.smartregister.service.HTTPAgent;
 import org.smartregister.util.NetworkUtils;
-
 import timber.log.Timber;
 
 /**
@@ -67,16 +65,13 @@ public class ProvidersSyncIntentService extends BaseSyncIntentService {
         try {
             AllSharedPreferences allSharedPreferences = new AllSharedPreferences(getDefaultSharedPreferences(getApplicationContext()));
 
-            String teamId = allSharedPreferences.fetchDefaultTeamId(allSharedPreferences.fetchRegisteredANM());
+            String teamId =  allSharedPreferences.fetchDefaultTeamId(allSharedPreferences.fetchRegisteredANM());
             if (teamId == null || teamId.isEmpty()) {
                 Timber.e("Team ID is missing in sync configuration.");
                 complete(FetchStatus.fetchedFailed);
                 return;
             }
-            String baseUrl = android.net.Uri.parse(getFormattedBaseUrl()).getHost();
-            if (android.net.Uri.parse(getFormattedBaseUrl()).getPort() != -1) {
-                baseUrl += ":" + android.net.Uri.parse(getFormattedBaseUrl()).getPort();
-            }
+           String baseUrl = android.net.Uri.parse(getFormattedBaseUrl()).getHost();
             String url = baseUrl + String.format(PROVIDERS_URL_PATTERN, teamId);
             Timber.i("Fetching providers from url: %s", url);
             if (httpAgent == null) {
