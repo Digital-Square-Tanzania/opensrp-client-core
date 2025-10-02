@@ -150,7 +150,7 @@ public class TaskServiceHelper extends BaseHelper {
                         task.setSyncStatus(BaseRepository.TYPE_Synced);
                         task.setLastModified(new DateTime());
 
-                        if ("Linkage".equals(task.getCode()) && !StringUtils.equals(owner, task.getOwner())) {
+                        if (!shouldPersistTask(task, owner)) {
                             continue;
                         }
 
@@ -335,5 +335,17 @@ public class TaskServiceHelper extends BaseHelper {
     protected HTTPAgent getHttpAgent() {
         return CoreLibrary.getInstance().context().getHttpAgent();
     }
-}
 
+    private boolean shouldPersistTask(Task task, String owner) {
+        if (task == null) {
+            return false;
+        }
+
+        if ("Linkage".equals(task.getCode()) && !StringUtils.equals(owner, task.getOwner())) {
+            return false;
+        }
+
+        return true;
+    }
+
+}
