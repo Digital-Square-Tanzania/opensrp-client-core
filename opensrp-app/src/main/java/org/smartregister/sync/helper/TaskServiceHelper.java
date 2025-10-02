@@ -148,6 +148,12 @@ public class TaskServiceHelper extends BaseHelper {
                     try {
                         task.setSyncStatus(BaseRepository.TYPE_Synced);
                         task.setLastModified(new DateTime());
+
+                        // Skip tasks that are not owned by this owner
+                        if ("Linkage".equals(task.getCode()) && !getOwner().equals(task.getOwner())) {
+                            continue;
+                        }
+
                         taskRepository.addOrUpdate(task);
                     } catch (Exception e) {
                         Timber.e(e, "Error saving task %s", task.getIdentifier());
