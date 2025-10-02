@@ -144,13 +144,13 @@ public class TaskServiceHelper extends BaseHelper {
             }
 
             if (tasks.size() > 0) {
+                String owner = getOwner();
                 for (Task task : tasks) {
                     try {
                         task.setSyncStatus(BaseRepository.TYPE_Synced);
                         task.setLastModified(new DateTime());
 
-                        // Skip tasks that are not owned by this owner
-                        if ("Linkage".equals(task.getCode()) && !getOwner().equals(task.getOwner())) {
+                        if ("Linkage".equals(task.getCode()) && !StringUtils.equals(owner, task.getOwner())) {
                             continue;
                         }
 
