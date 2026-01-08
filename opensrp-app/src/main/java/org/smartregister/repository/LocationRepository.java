@@ -14,6 +14,7 @@ import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationProperty;
 import org.smartregister.domain.PhysicalLocation;
 import org.smartregister.pathevaluator.dao.LocationDao;
+import org.smartregister.util.LocationStatusMapper;
 import org.smartregister.util.PropertiesConverter;
 
 import java.util.ArrayList;
@@ -69,6 +70,11 @@ public class LocationRepository extends BaseRepository implements LocationDao {
     public void addOrUpdate(Location location) {
         if (StringUtils.isBlank(location.getId()))
             throw new IllegalArgumentException("id not provided");
+
+        // Ensure operatingStatus is populated/normalized from properties enum
+        LocationStatusMapper.copyPropertyStatusToLocation(location);
+
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(ID, location.getId());
 
@@ -270,7 +276,11 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         if (opIndex != -1) {
             String statusFromCol = cursor.getString(opIndex);
             if (statusFromCol != null) {
-                loc.setOperatingStatus(statusFromCol);
+
+//              Adding operating status of the location from the database to the location object
+                LocationStatusMapper.applyStoredStatusToLocation(loc, statusFromCol);
+
+//                loc.setOperatingStatus(statusFromCol);
             }
         }
         return loc;
