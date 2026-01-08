@@ -8,8 +8,8 @@ public class Location extends PhysicalLocation {
     private String syncStatus;
     private Long rowid;
 
-//    Add operatingStatus to track whether a location is active/inactive
-    private String operatingStatus;
+//    Add status to track whether a location is active/inactive
+    private String status;
 
     public String getSyncStatus() {
         return syncStatus;
@@ -27,11 +27,11 @@ public class Location extends PhysicalLocation {
         this.rowid = rowid;
     }
 
-    public String getOperatingStatus() {
-        return operatingStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setOperatingStatus(String operatingStatus) {
-        this.operatingStatus = operatingStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

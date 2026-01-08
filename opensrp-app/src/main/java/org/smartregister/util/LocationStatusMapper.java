@@ -39,17 +39,17 @@ public final class LocationStatusMapper {
     }
 
     /**
-     * Copy status from Location.properties (enum) into Location.operatingStatus (string).
+     * Copy status from Location.properties (enum) into Location.status (string).
      * Safe if properties or status are null.
      */
     public static void copyPropertyStatusToLocation(Location location) {
         if (location == null) return;
         if (location.getProperties() == null) {
-            location.setOperatingStatus(null);
+            location.setStatus(null);
             return;
         }
         LocationProperty.PropertyStatus ps = location.getProperties().getStatus();
-        location.setOperatingStatus(toSerializedName(ps));
+        location.setStatus(toSerializedName(ps));
     }
 
     /**
@@ -59,14 +59,14 @@ public final class LocationStatusMapper {
     public static void applyStoredStatusToLocation(Location location, String storedStatus) {
         if (location == null) return;
         if (storedStatus == null) {
-            location.setOperatingStatus(null);
+            location.setStatus(null);
             return;
         }
         LocationProperty.PropertyStatus ps = fromSerializedName(storedStatus);
         if (ps != null) {
-            location.setOperatingStatus(toSerializedName(ps));
+            location.setStatus(toSerializedName(ps));
         } else {
-            location.setOperatingStatus(storedStatus);
+            location.setStatus(storedStatus);
         }
     }
 }

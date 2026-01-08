@@ -41,9 +41,9 @@ public class LocationRepository extends BaseRepository implements LocationDao {
     protected static final String LOCATION_TABLE = "location";
 
 //    Adding operating status column to track whether a location is active/inactive
-    protected static final String OPERATING_STATUS = "operating_status";
+    protected static final String STATUS = "status";
 
-    protected static final String[] COLUMNS = new String[]{ID, UUID, PARENT_ID, NAME, GEOJSON, OPERATING_STATUS};
+    protected static final String[] COLUMNS = new String[]{ID, UUID, PARENT_ID, NAME, GEOJSON, STATUS};
 
     private static final String CREATE_LOCATION_TABLE =
             "CREATE TABLE " + LOCATION_TABLE + " (" +
@@ -53,7 +53,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
                     NAME + " VARCHAR, " +
                     SYNC_STATUS + " VARCHAR DEFAULT '" + BaseRepository.TYPE_Synced + "', " +
                     GEOJSON + " VARCHAR NOT NULL, " +
-                    OPERATING_STATUS + " VARCHAR)";
+                    STATUS + " VARCHAR)";
 
     private static final String CREATE_LOCATION_NAME_INDEX = "CREATE INDEX "
             + LOCATION_TABLE + "_" + NAME + "_ind ON " + LOCATION_TABLE + "(" + NAME + ")";
@@ -93,7 +93,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         contentValues.put(SYNC_STATUS, location.getSyncStatus());
 
 //        Adding operating status of the location to the database
-        contentValues.put(OPERATING_STATUS, location.getOperatingStatus());
+        contentValues.put(STATUS, location.getStatus());
 
         getWritableDatabase().replace(getLocationTableName(), null, contentValues);
 
@@ -103,7 +103,11 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         Cursor cursor = null;
         List<Location> locations = new ArrayList<>();
         try {
-            cursor = getReadableDatabase().rawQuery("SELECT * FROM " + getLocationTableName(), null);
+            String activeLabel = LocationStatusMapper.toSerializedName(LocationProperty.PropertyStatus.ACTIVE);
+
+            cursor = getReadableDatabase().rawQuery(
+                    "SELECT * FROM " + getLocationTableName() + " WHERE " + STATUS + " = ?",
+                    new String[]{ activeLabel });
             while (cursor.moveToNext()) {
                 locations.add(readCursor(cursor));
             }
@@ -272,7 +276,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         Location loc = geoJson != null ? gson.fromJson(geoJson, Location.class) : new Location();
 
         // If a separate column was populated, ensure the in-memory object reflects it
-        int opIndex = cursor.getColumnIndex(OPERATING_STATUS);
+        int opIndex = cursor.getColumnIndex(STATUS);
         if (opIndex != -1) {
             String statusFromCol = cursor.getString(opIndex);
             if (statusFromCol != null) {
