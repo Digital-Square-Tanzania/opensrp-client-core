@@ -19,7 +19,6 @@ import org.smartregister.util.PropertiesConverter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import timber.log.Timber;
 
@@ -40,16 +39,20 @@ public class LocationRepository extends BaseRepository implements LocationDao {
 
     protected static final String LOCATION_TABLE = "location";
 
-    protected static final String[] COLUMNS = new String[]{ID, UUID, PARENT_ID, NAME, GEOJSON};
+//    Adding operating status column to track whether a location is active/inactive
+    protected static final String OPERATING_STATUS = "operating_status";
+
+    protected static final String[] COLUMNS = new String[]{ID, UUID, PARENT_ID, NAME, GEOJSON, OPERATING_STATUS};
 
     private static final String CREATE_LOCATION_TABLE =
             "CREATE TABLE " + LOCATION_TABLE + " (" +
-                    ID + " VARCHAR NOT NULL PRIMARY KEY," +
-                    UUID + " VARCHAR , " +
-                    PARENT_ID + " VARCHAR , " +
-                    NAME + " VARCHAR , " +
-                    SYNC_STATUS + " VARCHAR DEFAULT " + BaseRepository.TYPE_Synced + ", " +
-                    GEOJSON + " VARCHAR NOT NULL ) ";
+                    ID + " VARCHAR NOT NULL PRIMARY KEY, " +
+                    UUID + " VARCHAR, " +
+                    PARENT_ID + " VARCHAR, " +
+                    NAME + " VARCHAR, " +
+                    SYNC_STATUS + " VARCHAR DEFAULT '" + BaseRepository.TYPE_Synced + "', " +
+                    GEOJSON + " VARCHAR NOT NULL, " +
+                    OPERATING_STATUS + " VARCHAR)";
 
     private static final String CREATE_LOCATION_NAME_INDEX = "CREATE INDEX "
             + LOCATION_TABLE + "_" + NAME + "_ind ON " + LOCATION_TABLE + "(" + NAME + ")";
@@ -68,11 +71,24 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             throw new IllegalArgumentException("id not provided");
         ContentValues contentValues = new ContentValues();
         contentValues.put(ID, location.getId());
-        contentValues.put(UUID, location.getProperties().getUid());
-        contentValues.put(PARENT_ID, location.getProperties().getParentId());
-        contentValues.put(NAME, location.getProperties().getName());
+
+//        Check for null-safety of location properties
+        if (location.getProperties() != null) {
+            contentValues.put(UUID, location.getProperties().getUid());
+            contentValues.put(PARENT_ID, location.getProperties().getParentId());
+            contentValues.put(NAME, location.getProperties().getName());
+        } else {
+            contentValues.put(UUID, (String) null);
+            contentValues.put(PARENT_ID, (String) null);
+            contentValues.put(NAME, (String) null);
+        }
+
         contentValues.put(GEOJSON, gson.toJson(location));
         contentValues.put(SYNC_STATUS, location.getSyncStatus());
+
+//        Adding operating status of the location to the database
+        contentValues.put(OPERATING_STATUS, location.getOperatingStatus());
+
         getWritableDatabase().replace(getLocationTableName(), null, contentValues);
 
     }
@@ -85,7 +101,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             while (cursor.moveToNext()) {
                 locations.add(readCursor(cursor));
             }
-            cursor.close();
         } catch (Exception e) {
             Timber.e(e);
         } finally {
@@ -103,7 +118,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             while (cursor.moveToNext()) {
                 locationIds.add(cursor.getString(0));
             }
-            cursor.close();
         } catch (Exception e) {
             Timber.e(e);
         } finally {
@@ -168,7 +182,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             while (cursor.moveToNext()) {
                 locations.add(readCursor(cursor));
             }
-            cursor.close();
         } catch (Exception e) {
             Timber.e(e);
         } finally {
@@ -187,7 +200,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             if (cursor.moveToFirst()) {
                 return readCursor(cursor);
             }
-            cursor.close();
         } catch (Exception e) {
             Timber.e(e);
         } finally {
@@ -244,8 +256,24 @@ public class LocationRepository extends BaseRepository implements LocationDao {
     }
 
     protected Location readCursor(Cursor cursor) {
-        String geoJson = cursor.getString(cursor.getColumnIndex(GEOJSON));
-        return gson.fromJson(geoJson, Location.class);
+        // guard column indices to avoid getColumnIndex == -1 issues
+        int geoIndex = cursor.getColumnIndex(GEOJSON);
+        String geoJson = null;
+        if (geoIndex != -1) {
+            geoJson = cursor.getString(geoIndex);
+        }
+
+        Location loc = geoJson != null ? gson.fromJson(geoJson, Location.class) : new Location();
+
+        // If a separate column was populated, ensure the in-memory object reflects it
+        int opIndex = cursor.getColumnIndex(OPERATING_STATUS);
+        if (opIndex != -1) {
+            String statusFromCol = cursor.getString(opIndex);
+            if (statusFromCol != null) {
+                loc.setOperatingStatus(statusFromCol);
+            }
+        }
+        return loc;
     }
 
     public List<Location> getAllUnsynchedLocation() {
@@ -256,7 +284,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             while (cursor.moveToNext()) {
                 locations.add(readCursor(cursor));
             }
-            cursor.close();
         } catch (Exception e) {
             Timber.e(e, "EXCEPTION %s", e.toString());
         } finally {
@@ -290,12 +317,15 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         return Collections.singletonList(LocationConverter.convertPhysicalLocationToLocationResource(location));
     }
 
+
     @Override
     public List<com.ibm.fhir.model.resource.Location> findLocationByJurisdiction(String jurisdiction) {
-        return getLocationsByParentId(jurisdiction, StructureRepository.STRUCTURE_TABLE)
-                .stream()
-                .map(LocationConverter::convertPhysicalLocationToLocationResource)
-                .collect(Collectors.toList());
+        List<Location> plList = getLocationsByParentId(jurisdiction, StructureRepository.STRUCTURE_TABLE);
+        List<com.ibm.fhir.model.resource.Location> result = new ArrayList<>();
+        for (Location pl : plList) {
+            result.add(LocationConverter.convertPhysicalLocationToLocationResource(pl));
+        }
+        return result;
     }
 
     @Override
