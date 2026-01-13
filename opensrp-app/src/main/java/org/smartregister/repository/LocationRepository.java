@@ -40,7 +40,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
 
     protected static final String LOCATION_TABLE = "location";
 
-//    Adding operating status column to track whether a location is active/inactive
+//    Adding status column to track whether a location is active/inactive
     protected static final String STATUS = "status";
 
     protected static final String[] COLUMNS = new String[]{ID, UUID, PARENT_ID, NAME, GEOJSON, STATUS};
@@ -71,7 +71,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         if (StringUtils.isBlank(location.getId()))
             throw new IllegalArgumentException("id not provided");
 
-        // Ensure operatingStatus is populated/normalized from properties enum
+        // Ensure status is populated/normalized from properties enum
         LocationStatusMapper.copyPropertyStatusToLocation(location);
 
 
@@ -92,7 +92,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         contentValues.put(GEOJSON, gson.toJson(location));
         contentValues.put(SYNC_STATUS, location.getSyncStatus());
 
-//        Adding operating status of the location to the database
+//        Adding status of the location to the database
         contentValues.put(STATUS, location.getStatus());
 
         getWritableDatabase().replace(getLocationTableName(), null, contentValues);
@@ -281,10 +281,9 @@ public class LocationRepository extends BaseRepository implements LocationDao {
             String statusFromCol = cursor.getString(opIndex);
             if (statusFromCol != null) {
 
-//              Adding operating status of the location from the database to the location object
+//              Adding status of the location from the database to the location object
                 LocationStatusMapper.applyStoredStatusToLocation(loc, statusFromCol);
 
-//                loc.setOperatingStatus(statusFromCol);
             }
         }
         return loc;
