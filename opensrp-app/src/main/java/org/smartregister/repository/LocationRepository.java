@@ -14,7 +14,6 @@ import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationProperty;
 import org.smartregister.domain.PhysicalLocation;
 import org.smartregister.pathevaluator.dao.LocationDao;
-import org.smartregister.util.LocationStatusMapper;
 import org.smartregister.util.PropertiesConverter;
 
 import java.util.ArrayList;
@@ -71,8 +70,9 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         if (StringUtils.isBlank(location.getId()))
             throw new IllegalArgumentException("id not provided");
 
-        // Ensure status is populated/normalized from properties enum
-        LocationStatusMapper.copyPropertyStatusToLocation(location);
+        if (location.getStatus() == null){
+            location.setStatus(LocationProperty.PropertyStatus.ACTIVE.name());
+        }
 
 
         ContentValues contentValues = new ContentValues();
@@ -103,7 +103,7 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         Cursor cursor = null;
         List<Location> locations = new ArrayList<>();
         try {
-            String activeLabel = LocationStatusMapper.toSerializedName(LocationProperty.PropertyStatus.ACTIVE);
+            String activeLabel = LocationProperty.PropertyStatus.ACTIVE.name();
 
             cursor = getReadableDatabase().rawQuery(
                     "SELECT * FROM " + getLocationTableName() + " WHERE " + STATUS + " = ?",
@@ -266,24 +266,18 @@ public class LocationRepository extends BaseRepository implements LocationDao {
     }
 
     protected Location readCursor(Cursor cursor) {
-        // guard column indices to avoid getColumnIndex == -1 issues
-        int geoIndex = cursor.getColumnIndex(GEOJSON);
-        String geoJson = null;
-        if (geoIndex != -1) {
-            geoJson = cursor.getString(geoIndex);
-        }
+        String geoJson = cursor.getString(cursor.getColumnIndex(GEOJSON));
+        Location loc = gson.fromJson(geoJson, Location.class);
 
-        Location loc = geoJson != null ? gson.fromJson(geoJson, Location.class) : new Location();
+        if (loc.getStatus() == null) {
+            int opIndex = cursor.getColumnIndex(STATUS);
+            if (opIndex != -1) {
+                String statusFromCol = cursor.getString(opIndex);
 
-        // If a separate column was populated, ensure the in-memory object reflects it
-        int opIndex = cursor.getColumnIndex(STATUS);
-        if (opIndex != -1) {
-            String statusFromCol = cursor.getString(opIndex);
-            if (statusFromCol != null) {
-
-//              Adding status of the location from the database to the location object
-                LocationStatusMapper.applyStoredStatusToLocation(loc, statusFromCol);
-
+                if (StringUtils.isBlank(statusFromCol))
+                    loc.setStatus(LocationProperty.PropertyStatus.ACTIVE.name());
+                else
+                    loc.setStatus(statusFromCol);
             }
         }
         return loc;

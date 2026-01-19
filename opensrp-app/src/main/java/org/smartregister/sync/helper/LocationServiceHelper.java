@@ -37,7 +37,6 @@ import org.smartregister.repository.LocationRepository;
 import org.smartregister.repository.LocationTagRepository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.service.HTTPAgent;
-import org.smartregister.util.LocationStatusMapper;
 import org.smartregister.util.PropertiesConverter;
 import org.smartregister.util.Utils;
 
@@ -258,9 +257,9 @@ public class LocationServiceHelper extends BaseHelper {
             location.setProperties(property);
 
             if (Boolean.parseBoolean(openMrsLocation.getAttribute("retired").toString())){
-                location.setStatus(LocationStatusMapper.toSerializedName(LocationProperty.PropertyStatus.INACTIVE));
+                location.setStatus(LocationProperty.PropertyStatus.INACTIVE.name());
             }else {
-                location.setStatus(LocationStatusMapper.toSerializedName(LocationProperty.PropertyStatus.ACTIVE));
+                location.setStatus(LocationProperty.PropertyStatus.ACTIVE.name());
             }
 
 
