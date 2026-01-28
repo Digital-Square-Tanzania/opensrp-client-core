@@ -415,4 +415,14 @@ zitafutwa</string>
     <string name="sync_failed_malformed_url">Sync failed. Check Url Configuration</string>
     <string name="sync_failed_timeout_error">Sync imeshindwa. Haikuunganishwa kwenye server</string>
 
+    <string name="synced_events">Matukio yaliyosawazishwa:</string>
+    <string name="unsynced_events">Matukio yasiyosawazishwa:</string>
+    <string name="synced_clients">Wateja waliosawazishwa:</string>
+    <string name="unsynced_clients">Wateja wasiosawazishwa:</string>
+    <string name="validated_events">Matukio yaliyothibitishwa:</string>
+    <string name="validated_clients">Wateja waliothibitishwa:</string>
+    <string name="task_unprocessed_events">Matukio ya kazi yasiyochakatwa:</string>
+    <string name="refresh">Sasisha</string>
+    <string name="return_to_register">Rudi</string>
+
 </resources>

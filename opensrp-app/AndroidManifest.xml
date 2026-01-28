@@ -82,6 +82,13 @@
             android:name=".view.activity.SettingsActivity"
             android:launchMode="singleTask" />
 
+        <activity
+            android:name=".view.activity.StatsActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBarAndTitle"
+            android:exported="true" />
+
         <receiver android:name=".view.receiver.SyncBroadcastReceiver"
             android:exported="false" />
         <receiver android:name=".view.receiver.ConnectivityChangeReceiver"
