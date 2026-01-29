@@ -6,7 +6,7 @@ import android.database.Cursor;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.domain.Child;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.Boolean.TRUE;
-import static net.sqlcipher.DatabaseUtils.longForQuery;
+import static net.zetetic.database.DatabaseUtils.longForQuery;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.smartregister.repository.EligibleCoupleRepository.EC_TABLE_COLUMNS;
 import static org.smartregister.repository.EligibleCoupleRepository.EC_TABLE_NAME;

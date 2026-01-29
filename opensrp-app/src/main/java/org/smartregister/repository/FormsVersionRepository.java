@@ -3,7 +3,7 @@ package org.smartregister.repository;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.domain.FormDefinitionVersion;
 import org.smartregister.domain.SyncStatus;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static net.sqlcipher.DatabaseUtils.longForQuery;
+import static net.zetetic.database.DatabaseUtils.longForQuery;
 
 /**
  * Created by Dimas Ciputra on 3/21/15.

@@ -1,6 +1,6 @@
 package org.smartregister.repository;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 public abstract class DrishtiRepository {
     protected Repository masterRepository;

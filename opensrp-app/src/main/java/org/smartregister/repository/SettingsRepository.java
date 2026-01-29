@@ -3,7 +3,7 @@ package org.smartregister.repository;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.domain.Setting;
 import org.smartregister.domain.SyncStatus;

@@ -7,7 +7,7 @@ import android.webkit.JavascriptInterface;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
@@ -24,7 +24,7 @@ import timber.log.Timber;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
 import static java.util.UUID.randomUUID;
-import static net.sqlcipher.DatabaseUtils.longForQuery;
+import static net.zetetic.database.DatabaseUtils.longForQuery;
 import static org.smartregister.AllConstants.APP_NAME_INDONESIA;
 import static org.smartregister.AllConstants.ENTITY_ID_FIELD_NAME;
 import static org.smartregister.AllConstants.ENTITY_ID_PARAM;

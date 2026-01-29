@@ -3,7 +3,7 @@ package org.smartregister.util;
 import android.database.Cursor;
 import androidx.annotation.NonNull;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import timber.log.Timber;
 

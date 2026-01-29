@@ -1,7 +1,7 @@
 package org.smartregister.view.interactor;
 
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.Cursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.repository.BaseRepository;
 import org.smartregister.util.AppExecutors;

@@ -3,9 +3,9 @@ package org.smartregister.repository;
 import android.content.Context;
 import android.database.sqlite.SQLiteException;
 
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteDatabaseHook;
-import net.sqlcipher.database.SQLiteOpenHelper;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook;
+import net.zetetic.database.sqlcipher.SQLiteOpenHelper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.AllConstants;
@@ -55,6 +55,14 @@ public class Repository extends SQLiteOpenHelper {
         }
     };
 
+    private static void loadSqlCipherLib() {
+        try {
+            System.loadLibrary("sqlcipher");
+        } catch (UnsatisfiedLinkError e) {
+            Timber.e(e);
+        }
+    }
+
     public Repository(Context context, Session session, DrishtiRepository... repositories) {
         super(context, (session != null ? session.repositoryName() : AllConstants.DATABASE_NAME),
                 null, 1, hook);
@@ -65,7 +73,7 @@ public class Repository extends SQLiteOpenHelper {
         this.databasePath = context != null ? context.getDatabasePath(dbName)
                 : new File("/data/data/org.smartregister" + ".indonesia/databases/" + AllConstants.DATABASE_NAME);
 
-        SQLiteDatabase.loadLibs(context);
+        loadSqlCipherLib();
         for (DrishtiRepository repository : repositories) {
             repository.updateMasterRepository(this);
         }
@@ -87,7 +95,7 @@ public class Repository extends SQLiteOpenHelper {
         this.databasePath = context != null ? context.getDatabasePath(dbName)
                 : new File("/data/data/org.smartregister" + ".indonesia/databases/" + AllConstants.DATABASE_NAME);
 
-        SQLiteDatabase.loadLibs(context);
+        loadSqlCipherLib();
         for (DrishtiRepository repository : repositories) {
             repository.updateMasterRepository(this);
         }
