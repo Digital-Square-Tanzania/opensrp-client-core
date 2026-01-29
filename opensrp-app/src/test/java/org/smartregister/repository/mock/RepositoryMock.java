@@ -2,7 +2,7 @@ package org.smartregister.repository.mock;
 
 import android.content.Context;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.AllConstants;
 import org.smartregister.commonregistry.CommonFtsObject;

@@ -1,6 +1,6 @@
 package org.smartregister.sync.helper;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.json.JSONException;
 import org.junit.Assert;

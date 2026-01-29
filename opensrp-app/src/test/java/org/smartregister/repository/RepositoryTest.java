@@ -1,6 +1,6 @@
 package org.smartregister.repository;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.junit.Before;
 import org.junit.Rule;

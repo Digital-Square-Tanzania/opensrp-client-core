@@ -3,8 +3,8 @@ package org.smartregister.repository;
 import android.content.ContentValues;
 import android.util.Pair;
 
-import net.sqlcipher.MatrixCursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.MatrixCursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;

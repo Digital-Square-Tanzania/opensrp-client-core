@@ -4,8 +4,8 @@ import android.support.v4.util.Pair;
 
 import com.google.gson.Gson;
 
-import net.sqlcipher.MatrixCursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.MatrixCursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;

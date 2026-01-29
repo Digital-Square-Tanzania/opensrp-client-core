@@ -8,7 +8,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import net.sqlcipher.MatrixCursor;
+import android.database.MatrixCursor;
 
 import org.junit.Before;
 import org.junit.Test;

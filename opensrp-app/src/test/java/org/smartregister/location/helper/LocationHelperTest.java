@@ -1,6 +1,6 @@
 package org.smartregister.location.helper;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.junit.After;
 import org.junit.Before;

@@ -2,7 +2,7 @@ package org.smartregister.repository;
 
 import android.content.ContentValues;
 
-import net.sqlcipher.MatrixCursor;
+import android.database.MatrixCursor;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,7 +21,7 @@ import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.commonregistry.CommonRepositoryInformationHolder;
 import org.smartregister.domain.SyncStatus;
 import org.smartregister.domain.form.FormSubmission;
-import org.smartregister.repository.mock.SQLiteDatabaseMock;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class FormDataRepositoryTest extends BaseUnitTest {
     private FormDataRepository formDataRepository;
 
     @Mock
-    private SQLiteDatabaseMock sqLiteDatabase;
+    private SQLiteDatabase sqLiteDatabase;
     @Mock
     private DristhiConfiguration dristhiConfiguration;
     @Mock

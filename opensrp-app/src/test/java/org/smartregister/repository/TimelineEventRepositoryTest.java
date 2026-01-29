@@ -4,8 +4,8 @@ import android.content.ContentValues;
 
 import junit.framework.Assert;
 
-import net.sqlcipher.MatrixCursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.MatrixCursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.joda.time.LocalDate;
 import org.junit.Before;
