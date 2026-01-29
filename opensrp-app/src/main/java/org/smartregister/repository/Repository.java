@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteException;
 
 import net.zetetic.database.sqlcipher.SQLiteDatabase;
-import net.zetetic.database.sqlcipher.SQLiteDatabaseHook;
 import net.zetetic.database.sqlcipher.SQLiteOpenHelper;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,27 +32,7 @@ public class Repository extends SQLiteOpenHelper {
     private String dbName;
     private Session session;
 
-    private static SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
-        @Override
-        public void preKey(SQLiteDatabase database) {
-            // Do nothing before keying
-        }
-
-        @Override
-        public void postKey(SQLiteDatabase database) {
-            if (!DatabaseMigrationUtils.performCipherMigrationToV4(database)) {
-                throw new DatabaseMigrationException("Database migration to SQLiteCipher v4 was not successful");
-            } else {
-                CoreLibrary.getInstance().context().allSharedPreferences().setMigratedToSqlite4();
-                Timber.i("Database migration to Cipher 4 complete");
-            }
-
-            // Disable cipher memory security which makes database operations slow
-            database.execSQL("PRAGMA cipher_memory_security = OFF;");
-            //set journal mode to TRUNCATE
-            database.rawExecSQL("PRAGMA journal_mode = TRUNCATE;");
-        }
-    };
+    private final String passphrase;
 
     private static void loadSqlCipherLib() {
         try {
@@ -64,34 +43,40 @@ public class Repository extends SQLiteOpenHelper {
     }
 
     public Repository(Context context, Session session, DrishtiRepository... repositories) {
-        super(context, (session != null ? session.repositoryName() : AllConstants.DATABASE_NAME),
-                null, 1, hook);
-        this.repositories = repositories;
-        this.context = context;
-        this.session = session;
-        this.dbName = session != null ? session.repositoryName() : AllConstants.DATABASE_NAME;
-        this.databasePath = context != null ? context.getDatabasePath(dbName)
-                : new File("/data/data/org.smartregister" + ".indonesia/databases/" + AllConstants.DATABASE_NAME);
-
-        loadSqlCipherLib();
-        for (DrishtiRepository repository : repositories) {
-            repository.updateMasterRepository(this);
-        }
+        this(context,
+                session != null ? session.repositoryName() : AllConstants.DATABASE_NAME,
+                1,
+                session,
+                null,
+                resolvePassphrase(),
+                repositories);
     }
 
     public Repository(Context context, Session session, CommonFtsObject commonFtsObject,
                       DrishtiRepository... repositories) {
-        this(context, session, repositories);
-        this.commonFtsObject = commonFtsObject;
+        this(context,
+                session != null ? session.repositoryName() : AllConstants.DATABASE_NAME,
+                1,
+                session,
+                commonFtsObject,
+                resolvePassphrase(),
+                repositories);
     }
 
     public Repository(Context context, String dbName, int version, Session session,
                       CommonFtsObject commonFtsObject, DrishtiRepository... repositories) {
-        super(context, dbName, null, version, hook);
+        this(context, dbName, version, session, commonFtsObject, resolvePassphrase(), repositories);
+    }
+
+    private Repository(Context context, String dbName, int version, Session session,
+                       CommonFtsObject commonFtsObject, String passphrase, DrishtiRepository... repositories) {
+        super(context, dbName, passphrase, null, version, 0, null, null, false);
         this.dbName = dbName;
         this.repositories = repositories;
         this.context = context;
         this.session = session;
+        this.commonFtsObject = commonFtsObject;
+        this.passphrase = passphrase;
         this.databasePath = context != null ? context.getDatabasePath(dbName)
                 : new File("/data/data/org.smartregister" + ".indonesia/databases/" + AllConstants.DATABASE_NAME);
 
@@ -99,7 +84,6 @@ public class Repository extends SQLiteOpenHelper {
         for (DrishtiRepository repository : repositories) {
             repository.updateMasterRepository(this);
         }
-        this.commonFtsObject = commonFtsObject;
     }
 
     @Override
@@ -147,27 +131,47 @@ public class Repository extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onOpen(SQLiteDatabase database) {
+        super.onOpen(database);
+        if (!DatabaseMigrationUtils.performCipherMigrationToV4(database)) {
+            throw new DatabaseMigrationException("Database migration to SQLiteCipher v4 was not successful");
+        }
+
+        if (!CoreLibrary.getInstance().context().allSharedPreferences().isMigratedToSqlite4()) {
+            CoreLibrary.getInstance().context().allSharedPreferences().setMigratedToSqlite4();
+            Timber.i("Database migration to Cipher 4 complete");
+        }
+
+        // Disable cipher memory security which makes database operations slow
+        database.execSQL("PRAGMA cipher_memory_security = OFF;");
+        // set journal mode to TRUNCATE
+        database.rawExecSQL("PRAGMA journal_mode = TRUNCATE;");
+    }
+
+    @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
     }
 
+    @Override
     public SQLiteDatabase getReadableDatabase() {
-        if (password() == null) {
+        if (passphrase == null || passphrase.isEmpty()) {
             throw new RuntimeException("Password has not been set!");
         }
-        return getReadableDatabase(password());
+        return super.getReadableDatabase();
     }
 
+    @Override
     public SQLiteDatabase getWritableDatabase() {
-        if (password() == null) {
+        if (passphrase == null || passphrase.isEmpty()) {
             throw new RuntimeException("Password has not been set!");
         }
-        return getWritableDatabase(password());
+        return super.getWritableDatabase();
     }
 
     private boolean isDatabaseWritable(String password) {
         SQLiteDatabase database = SQLiteDatabase
                 .openDatabase(databasePath.getPath(), password, null,
-                        SQLiteDatabase.OPEN_READONLY, hook);
+                        SQLiteDatabase.OPEN_READONLY, null);
         database.close();
         return true;
     }
@@ -198,8 +202,13 @@ public class Repository extends SQLiteOpenHelper {
         }
     }
 
-    private String password() {
-        return DrishtiApplication.getInstance().getPassword();
+    private static String resolvePassphrase() {
+        DrishtiApplication instance = DrishtiApplication.getInstance();
+        if (instance == null) {
+            return "";
+        }
+        String password = instance.getPassword();
+        return password != null ? password : "";
     }
 
     public boolean deleteRepository() {
