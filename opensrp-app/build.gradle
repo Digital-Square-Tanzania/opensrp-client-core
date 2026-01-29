@@ -166,7 +166,9 @@ task copyTestResources() {
 }
 
 afterEvaluate {
-    assembleDebug.dependsOn(copyTestResources)
+    tasks.matching { it.name == "assembleDebug" }.configureEach {
+        dependsOn(copyTestResources)
+    }
 }
 configurations.all {
     resolutionStrategy.force 'commons-codec:commons-codec:1.10'
