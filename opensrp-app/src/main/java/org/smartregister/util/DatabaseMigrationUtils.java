@@ -5,7 +5,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteOutOfMemoryException;
 import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteStatement;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.CoreLibrary;
@@ -205,22 +207,46 @@ public class DatabaseMigrationUtils {
 
     public static boolean performCipherMigrationToV4(@NonNull SQLiteDatabase database) {
         if (!CoreLibrary.getInstance().context().allSharedPreferences().isMigratedToSqlite4()) {
-            Cursor cursor = null;
+            SQLiteStatement statement = null;
             try {
-                cursor = database.rawQuery("PRAGMA cipher_migrate", new Object[]{});
-
-                if (cursor != null && cursor.moveToFirst()) {
-                    String value = cursor.getString(0);
-
-                    return (!TextUtils.isEmpty(value) && "0".equals(value));
+                // Reduce memory pressure during migration where possible.
+                try {
+                    database.execSQL("PRAGMA cipher_memory_security = OFF;");
+                } catch (Exception e) {
+                    Timber.w(e, "Unable to disable cipher memory security before migration");
                 }
+                statement = database.compileStatement("PRAGMA cipher_migrate");
+                long result = statement.simpleQueryForLong();
+
+                String value = String.valueOf(result);
+                return (!TextUtils.isEmpty(value) && "0".equals(value));
+            } catch (SQLiteOutOfMemoryException oom) {
+                Timber.e(oom, "SQLiteCipher migration OOM; retrying without cursor window");
+                try {
+                    database.rawExecSQL("PRAGMA cipher_migrate");
+                    return true;
+                } catch (Exception e) {
+                    Timber.e(e);
+                    return false;
+                }
+            } catch (Exception e) {
+                if (e.getMessage() != null && e.getMessage().contains("out of memory")) {
+                    Timber.e(e, "SQLiteCipher migration OOM; retrying without cursor window");
+                    try {
+                        database.rawExecSQL("PRAGMA cipher_migrate");
+                        return true;
+                    } catch (Exception retryException) {
+                        Timber.e(retryException);
+                        return false;
+                    }
+                }
+                Timber.e(e);
+                return false;
             } finally {
-                if (cursor != null) {
-                    cursor.close();
+                if (statement != null) {
+                    statement.close();
                 }
             }
-
-            return false;
         } else {
             Timber.i("SQLiteCipher database is already v4");
             return true;
