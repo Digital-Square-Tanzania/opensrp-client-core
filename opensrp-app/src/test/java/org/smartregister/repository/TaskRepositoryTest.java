@@ -5,10 +5,10 @@ import android.content.ContentValues;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.sqlcipher.MatrixCursor;
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteException;
-import net.sqlcipher.database.SQLiteStatement;
+import android.database.MatrixCursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import net.zetetic.database.sqlcipher.SQLiteStatement;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

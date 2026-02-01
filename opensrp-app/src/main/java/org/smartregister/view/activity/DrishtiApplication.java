@@ -6,8 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDex;
 
-import net.sqlcipher.database.SQLiteDatabase;
-
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
 import org.smartregister.BuildConfig;
@@ -83,7 +81,7 @@ public abstract class DrishtiApplication extends Application {
             initializeCrashLyticsTree();
 
             mInstance = this;
-            SQLiteDatabase.loadLibs(this);
+            System.loadLibrary("sqlcipher");
         } catch (UnsatisfiedLinkError e) {
             logError("Error on onCreate: " + e);
         }

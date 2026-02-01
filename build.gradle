@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven{  url "https://plugins.gradle.org/m2/" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
@@ -24,7 +23,6 @@ configure(allprojects) { project ->
     buildscript {
         repositories {
             google()
-            jcenter()
             mavenCentral()
             maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
             mavenLocal()
@@ -32,14 +30,11 @@ configure(allprojects) { project ->
     }
 }
 
-project.ext.preDexLibs = !project.hasProperty('disablePreDex')
-
 subprojects {
 
     group = 'org.smartregister'
 
-    ext.androidToolsBuildGradle     = '4.0.0'
-    ext.androidBuildToolsVersion    = '29.0.3'
+    ext.androidBuildToolsVersion    = '30.0.3'
     ext.androidMinSdkVersion        = 21
     ext.androidCompileSdkVersion    = 33
     ext.androidTargetSdkVersion     = 33
@@ -49,12 +44,14 @@ subprojects {
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        maven { url "http://acra.googlecode.com/svn/repository/releases" }
+        maven {
+            url "http://acra.googlecode.com/svn/repository/releases"
+            allowInsecureProtocol = true
+        }
         maven { url "https://repo.maven.apache.org/maven2" }
-        maven { url "http://cloudant.github.io/cloudant-sync-eap/repository" }
+        maven { url "https://cloudant.github.io/cloudant-sync-eap/repository" }
         maven {
             url "https://s3.amazonaws.com/repo.commonsware.com"
         }
@@ -62,15 +59,6 @@ subprojects {
         mavenLocal()
     }
 
-    // Improve build server performance by allowing disabling of pre-dexing
-    // (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
-    project.plugins.whenPluginAdded { plugin ->
-        if ("com.android.build.gradle.AppPlugin".equals(plugin.class.name)) {
-            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
-        } else if ("com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)) {
-            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
-        }
-    }
 }
 
 apply plugin: 'java'

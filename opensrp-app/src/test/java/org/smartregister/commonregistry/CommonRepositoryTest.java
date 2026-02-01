@@ -2,9 +2,9 @@ package org.smartregister.commonregistry;
 
 import android.content.ContentValues;
 
-import net.sqlcipher.MatrixCursor;
-import net.sqlcipher.SQLException;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.MatrixCursor;
+import android.database.SQLException;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -5,8 +5,8 @@ import android.content.ContentValues;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.sqlcipher.MatrixCursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.MatrixCursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;

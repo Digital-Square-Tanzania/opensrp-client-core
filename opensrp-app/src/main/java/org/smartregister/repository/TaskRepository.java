@@ -7,9 +7,9 @@ import android.text.TextUtils;
 import com.ibm.fhir.model.resource.QuestionnaireResponse;
 import com.ibm.fhir.path.FHIRPathElementNode;
 
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteStatement;
+import android.database.Cursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteStatement;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;

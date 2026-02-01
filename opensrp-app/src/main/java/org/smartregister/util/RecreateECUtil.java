@@ -3,7 +3,7 @@ package org.smartregister.util;
 import android.database.Cursor;
 import androidx.core.util.Pair;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;

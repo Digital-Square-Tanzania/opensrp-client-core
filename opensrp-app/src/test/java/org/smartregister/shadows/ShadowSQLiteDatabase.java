@@ -2,7 +2,7 @@ package org.smartregister.shadows;
 
 import android.content.Context;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;

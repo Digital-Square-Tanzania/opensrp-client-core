@@ -5,7 +5,7 @@ import android.database.Cursor;
 
 import androidx.annotation.Nullable;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.AllConstants;
 import org.smartregister.domain.ProfileImage;

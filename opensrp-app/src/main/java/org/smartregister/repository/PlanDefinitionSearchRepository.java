@@ -2,8 +2,8 @@ package org.smartregister.repository;
 
 import android.content.ContentValues;
 
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.Cursor;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.joda.time.LocalDate;
 import org.smartregister.domain.PlanDefinition;

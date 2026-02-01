@@ -1,6 +1,6 @@
 package org.smartregister.repository.mock;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
 
 import org.smartregister.repository.DrishtiRepository;
 

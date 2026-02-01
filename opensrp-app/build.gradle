@@ -3,13 +3,12 @@ description = 'OpenSRP core client library'
 buildscript {
     repositories {
         google()
-        jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:$androidToolsBuildGradle"
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath 'org.apache.commons:commons-lang3:3.3.2'
-        classpath 'com.google.gms:google-services:4.3.3'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
+        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
     }
 }
 
@@ -34,7 +33,6 @@ allprojects {
         }
         mavenLocal()
         google()
-        jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
 }
@@ -73,7 +71,6 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            debuggable true
             testCoverageEnabled = true
             signingConfig signingConfigs.config
             zipAlignEnabled true
@@ -95,9 +92,7 @@ android {
         abortOnError false
     }
 
-    dexOptions {
-        javaMaxHeapSize "4g"
-    }
+
 
     defaultConfig {
         // Enabling multidex support.
@@ -105,8 +100,6 @@ android {
         //applicationId "org.smartregister"
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode Integer.parseInt(project.VERSION_CODE)
-        versionName project.VERSION_NAME
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
         buildConfigField "long", "BUILD_TIMESTAMP", System.currentTimeMillis() + "L"
         project.archivesBaseName = "opensrp-client-core"
@@ -166,7 +159,9 @@ task copyTestResources() {
 }
 
 afterEvaluate {
-    assembleDebug.dependsOn(copyTestResources)
+    tasks.matching { it.name == "assembleDebug" }.configureEach {
+        dependsOn(copyTestResources)
+    }
 }
 configurations.all {
     resolutionStrategy.force 'commons-codec:commons-codec:1.10'
@@ -232,9 +227,12 @@ publishing {
                         }
                     }
                 }
-                configurations.compile.getDependencies().each { dep -> addDependency(dep, 'compile') }
-                configurations.api.getDependencies().each { dep -> addDependency(dep, 'compile') }
-                configurations.implementation.getDependencies().each { dep -> addDependency(dep, 'compile') }
+                configurations.findByName('api')?.getDependencies()?.each { dep ->
+                    addDependency(dep, 'compile')
+                }
+                configurations.findByName('implementation')?.getDependencies()?.each { dep ->
+                    addDependency(dep, 'compile')
+                }
             }
 
         }
@@ -243,7 +241,8 @@ publishing {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.3'
-    implementation 'net.zetetic:android-database-sqlcipher:4.5.4'
+    implementation 'net.zetetic:sqlcipher-android:4.13.0'
+    implementation 'androidx.sqlite:sqlite:2.2.0'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'org.codehaus.jackson:jackson-core-asl:1.9.13'
     implementation 'com.android.support:appcompat-v7:28.0.0'
@@ -287,7 +286,7 @@ dependencies {
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.6'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
-    implementation('org.smartregister:android-p2p-sync:0.3.9-MOH-SNAPSHOT') {
+    implementation('org.smartregister:android-p2p-sync:1.0.0-MOH-SNAPSHOT') {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'android.arch.core', module: 'runtime'
