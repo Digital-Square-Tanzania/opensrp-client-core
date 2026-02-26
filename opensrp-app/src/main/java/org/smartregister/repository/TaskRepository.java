@@ -659,7 +659,14 @@ public class TaskRepository extends BaseRepository implements TaskDao {
 
     @Override
     public Task getTaskByEntityId(String s) {
-        // TODO implement this
+        try (Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM " + TASK_TABLE +
+                " WHERE " + FOR + " =? ORDER BY " + ROWID + " DESC LIMIT 1", new String[]{s})) {
+            if (cursor.moveToFirst()) {
+                return readCursor(cursor);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
         return null;
     }
 
