@@ -245,6 +245,18 @@ public class TaskRepositoryTest extends BaseUnitTest {
 
     }
 
+    @Test
+    public void testGetTaskByEntityId() {
+        String entityId = "location.properties.uid:41587456-b7c8-4c4e-b433-23a786f742fc";
+        when(sqLiteDatabase.rawQuery("SELECT * FROM task WHERE for =? ORDER BY rowid DESC LIMIT 1", new String[]{entityId})).thenReturn(getCursor());
+        Task task = taskRepository.getTaskByEntityId(entityId);
+        verify(sqLiteDatabase).rawQuery(stringArgumentCaptor.capture(), argsCaptor.capture());
+        assertEquals("SELECT * FROM task WHERE for =? ORDER BY rowid DESC LIMIT 1", stringArgumentCaptor.getValue());
+        assertEquals(1, argsCaptor.getValue().length);
+        assertEquals(entityId, argsCaptor.getValue()[0]);
+        assertEquals("tsk11231jh22", task.getIdentifier());
+    }
+
 
     public MatrixCursor getCursor() {
         MatrixCursor cursor = new MatrixCursor(TaskRepository.COLUMNS);
