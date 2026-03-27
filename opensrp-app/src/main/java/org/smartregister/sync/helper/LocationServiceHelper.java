@@ -248,35 +248,42 @@ public class LocationServiceHelper extends BaseHelper {
                         }.getType());
 
         for (org.smartregister.domain.jsonmapping.Location openMrsLocation : receivedOpenMrsLocations) {
-            Location location = new Location();
-            location.setId(openMrsLocation.getLocationId());
-            LocationProperty property = new LocationProperty();
-            property.setUid(openMrsLocation.getLocationId());
-            property.setParentId(openMrsLocation.getParentLocation().getLocationId());
-            property.setName(openMrsLocation.getName());
-            location.setProperties(property);
+            try {
+                Location location = new Location();
+                location.setId(openMrsLocation.getLocationId());
+                LocationProperty property = new LocationProperty();
+                property.setUid(openMrsLocation.getLocationId());
+                property.setParentId(openMrsLocation.getParentLocation().getLocationId());
+                property.setName(openMrsLocation.getName());
+                location.setProperties(property);
+                try {
+                    if (Boolean.parseBoolean(openMrsLocation.getAttribute("retired").toString())) {
+                        location.setStatus(LocationProperty.PropertyStatus.INACTIVE.name());
+                    } else {
+                        location.setStatus(LocationProperty.PropertyStatus.ACTIVE.name());
+                    }
+                } catch (Exception e) {
+                    Timber.e(e);
+                    location.setStatus(LocationProperty.PropertyStatus.ACTIVE.name());
+                }
 
-            if (Boolean.parseBoolean(openMrsLocation.getAttribute("retired").toString())){
-                location.setStatus(LocationProperty.PropertyStatus.INACTIVE.name());
-            }else {
-                location.setStatus(LocationProperty.PropertyStatus.ACTIVE.name());
-            }
+
+                locationRepository.addOrUpdate(location);
 
 
+                for (String tagName : openMrsLocation.getTags()) {
+                    LocationTag locationTag = new LocationTag();
+                    locationTag.setLocationId(openMrsLocation.getLocationId());
+                    locationTag.setName(tagName);
 
-            locationRepository.addOrUpdate(location);
-
-
-            for (String tagName : openMrsLocation.getTags()) {
-                LocationTag locationTag = new LocationTag();
-                locationTag.setLocationId(openMrsLocation.getLocationId());
-                locationTag.setName(tagName);
-
-                locationTagRepository.addOrUpdate(locationTag);
+                    locationTagRepository.addOrUpdate(locationTag);
+                }
+            } catch (Exception e) {
+                Timber.e(e);
             }
         }
 
-        if (receivedOpenMrsLocations.size() > 0)
+        if (!receivedOpenMrsLocations.isEmpty())
             allSharedPreferences.getPreferences().edit().putLong(LAST_LOCATIONS_BY_LEVEL_AND_TAGS_SYNC_TIMESTAMP, Calendar.getInstance().getTimeInMillis()).commit();
     }
 
