@@ -270,13 +270,16 @@ public class LocationServiceHelper extends BaseHelper {
 
                 locationRepository.addOrUpdate(location);
 
+                locationTagRepository.deleteLocationTagsByLocationId(openMrsLocation.getLocationId());
 
-                for (String tagName : openMrsLocation.getTags()) {
-                    LocationTag locationTag = new LocationTag();
-                    locationTag.setLocationId(openMrsLocation.getLocationId());
-                    locationTag.setName(tagName);
+                if (!Utils.isEmptyCollection(openMrsLocation.getTags())) {
+                    for (String tagName : openMrsLocation.getTags()) {
+                        LocationTag locationTag = new LocationTag();
+                        locationTag.setLocationId(openMrsLocation.getLocationId());
+                        locationTag.setName(tagName);
 
-                    locationTagRepository.addOrUpdate(locationTag);
+                        locationTagRepository.addOrUpdate(locationTag);
+                    }
                 }
             } catch (Exception e) {
                 Timber.e(e);
@@ -416,4 +419,3 @@ public class LocationServiceHelper extends BaseHelper {
     }
 
 }
-

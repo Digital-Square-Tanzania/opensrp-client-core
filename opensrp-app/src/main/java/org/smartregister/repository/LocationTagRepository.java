@@ -59,6 +59,16 @@ public class LocationTagRepository extends BaseRepository {
     }
 
     /**
+     * this method is used to delete all location tags for a location
+     * @param locationId id of the location whose tags should be deleted.
+     */
+    public void deleteLocationTagsByLocationId(String locationId) {
+        if (StringUtils.isBlank(locationId))
+            throw new IllegalArgumentException("location id not provided");
+        getWritableDatabase().delete(getLocationTagTableName(), LOCATION_ID + " = ?", new String[]{locationId});
+    }
+
+    /**
      *  this method returns a list of all location tags stored
      * @return a list of all location tags stored
      */
