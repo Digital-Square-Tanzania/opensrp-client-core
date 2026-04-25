@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -40,6 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.smartregister.AllConstants.LAST_LOCATIONS_BY_LEVEL_AND_TAGS_SYNC_TIMESTAMP;
 import static org.smartregister.AllConstants.OPERATIONAL_AREAS;
 import static org.smartregister.sync.helper.LocationServiceHelper.LOCATION_LAST_SYNC_DATE;
 
@@ -89,6 +91,7 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
         Whitebox.setInternalState(locationServiceHelper, "allSharedPreferences", allSharedPreferences);
         Mockito.doReturn("anm").when(allSharedPreferences).fetchRegisteredANM();
         Mockito.doReturn("fb7ed5db-138d-4e6f-94d8-bc443b58dadb").when(allSharedPreferences).fetchDefaultLocalityId("anm");
+        allSharedPreferences.getPreferences().edit().putLong(LAST_LOCATIONS_BY_LEVEL_AND_TAGS_SYNC_TIMESTAMP, 0).commit();
         Mockito.doReturn("https://sample-stage.smartregister.org/opensrp/").when(locationServiceHelper).getFormattedBaseUrl();
         Mockito.doReturn(httpAgent).when(locationServiceHelper).getHttpAgent();
         Mockito.doReturn(syncConfiguration).when(locationServiceHelper).getSyncConfiguration();
@@ -139,6 +142,50 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
         locationServiceHelper.fetchLocationsByLevelAndTags();
         Mockito.verify(locationRepository, Mockito.atLeastOnce()).addOrUpdate(Mockito.any(Location.class));
         Mockito.verify(locationTagRepository, Mockito.atLeastOnce()).addOrUpdate(Mockito.any(LocationTag.class));
+        Mockito.verify(locationTagRepository, Mockito.times(2)).deleteLocationTagsByLocationId(Mockito.anyString());
+    }
+
+    @Test
+    public void fetchLocationsByLevelAndTagsShouldClearTagsBeforeAddingLatestTags() throws Exception {
+        Mockito.doReturn(new Response<>(ResponseStatus.success,
+                "[{\"locationId\":\"b949c2b5-d5f6-4a1b-ad03-e82e7abbd47c\",\"name\":\"Ebrahim Haji - Unified\"," +
+                        "\"parentLocation\":{\"locationId\":\"620e3393-38aa-4797-85c4-3427cc882e00\",\"name\":\"Ilala MC - Unified\"," +
+                        "\"voided\":false},\"tags\":[\"Facility\",\"School\"],\"voided\":false}]"))
+                .when(httpAgent).post(Mockito.anyString(), Mockito.anyString());
+
+        locationServiceHelper.fetchLocationsByLevelAndTags();
+
+        InOrder inOrder = Mockito.inOrder(locationTagRepository);
+        inOrder.verify(locationTagRepository).deleteLocationTagsByLocationId("b949c2b5-d5f6-4a1b-ad03-e82e7abbd47c");
+        inOrder.verify(locationTagRepository, Mockito.times(2)).addOrUpdate(Mockito.any(LocationTag.class));
+    }
+
+    @Test
+    public void fetchLocationsByLevelAndTagsShouldClearTagsWhenReceivedTagsAreEmpty() throws Exception {
+        Mockito.doReturn(new Response<>(ResponseStatus.success,
+                "[{\"locationId\":\"b949c2b5-d5f6-4a1b-ad03-e82e7abbd47c\",\"name\":\"Ebrahim Haji - Unified\"," +
+                        "\"parentLocation\":{\"locationId\":\"620e3393-38aa-4797-85c4-3427cc882e00\",\"name\":\"Ilala MC - Unified\"," +
+                        "\"voided\":false},\"tags\":[],\"voided\":false}]"))
+                .when(httpAgent).post(Mockito.anyString(), Mockito.anyString());
+
+        locationServiceHelper.fetchLocationsByLevelAndTags();
+
+        Mockito.verify(locationTagRepository).deleteLocationTagsByLocationId("b949c2b5-d5f6-4a1b-ad03-e82e7abbd47c");
+        Mockito.verify(locationTagRepository, Mockito.never()).addOrUpdate(Mockito.any(LocationTag.class));
+    }
+
+    @Test
+    public void fetchLocationsByLevelAndTagsShouldClearTagsWhenReceivedTagsAreMissing() throws Exception {
+        Mockito.doReturn(new Response<>(ResponseStatus.success,
+                "[{\"locationId\":\"b949c2b5-d5f6-4a1b-ad03-e82e7abbd47c\",\"name\":\"Ebrahim Haji - Unified\"," +
+                        "\"parentLocation\":{\"locationId\":\"620e3393-38aa-4797-85c4-3427cc882e00\",\"name\":\"Ilala MC - Unified\"," +
+                        "\"voided\":false},\"voided\":false}]"))
+                .when(httpAgent).post(Mockito.anyString(), Mockito.anyString());
+
+        locationServiceHelper.fetchLocationsByLevelAndTags();
+
+        Mockito.verify(locationTagRepository).deleteLocationTagsByLocationId("b949c2b5-d5f6-4a1b-ad03-e82e7abbd47c");
+        Mockito.verify(locationTagRepository, Mockito.never()).addOrUpdate(Mockito.any(LocationTag.class));
     }
 
     @Test(expected = IllegalArgumentException.class)

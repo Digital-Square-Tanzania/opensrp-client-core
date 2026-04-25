@@ -107,6 +107,22 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
         locationTagRepository.addOrUpdate(locationTag);
     }
 
+    @Test
+    public void testDeleteLocationTagsByLocationId() {
+        locationTagRepository.deleteLocationTagsByLocationId("1");
+
+        verify(sqLiteDatabase).delete(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), argsCaptor.capture());
+        assertEquals(LOCATION_TAG_TABLE, stringArgumentCaptor.getAllValues().get(0));
+        assertEquals(LOCATION_ID + " = ?", stringArgumentCaptor.getAllValues().get(1));
+        assertEquals(1, argsCaptor.getValue().length);
+        assertEquals("1", argsCaptor.getValue()[0]);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDeleteLocationTagsByLocationIdShouldThrowException() {
+        locationTagRepository.deleteLocationTagsByLocationId("");
+    }
+
 
     @Test
     public void tesGetAllLocationTags() {
