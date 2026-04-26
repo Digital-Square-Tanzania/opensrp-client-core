@@ -7,6 +7,7 @@ import android.util.Xml;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.codec.CharEncoding;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -1085,7 +1086,13 @@ public class FormUtils {
     public JSONObject getFormJson(String formIdentity) {
         if (mContext != null) {
             try {
-                String locale = mContext.getResources().getConfiguration().locale.getLanguage();
+                String locale = null;
+                if (theAppContext != null && theAppContext.allSharedPreferences() != null) {
+                    locale = theAppContext.allSharedPreferences().getPreference(AllConstants.LANGUAGE_PREFERENCE_KEY);
+                }
+                if (StringUtils.isBlank(locale)) {
+                    locale = mContext.getResources().getConfiguration().locale.getLanguage();
+                }
                 locale = locale.equalsIgnoreCase(Locale.ENGLISH.getLanguage()) ? "" : "-" + locale;
 
                 InputStream inputStream;
