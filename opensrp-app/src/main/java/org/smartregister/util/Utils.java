@@ -612,7 +612,7 @@ public class Utils {
         String preferredName = getPrefferedName();
 
         if (StringUtils.isNotBlank(preferredName)) {
-            String[] preferredNameArray = preferredName.split(" ");
+            String[] preferredNameArray = preferredName.trim().split("\\s+");
             initials = "";
             if (preferredNameArray.length > 1) {
                 initials = String.valueOf(preferredNameArray[0].charAt(0)) + String.valueOf(preferredNameArray[1].charAt(0));
