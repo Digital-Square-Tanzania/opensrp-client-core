@@ -25,6 +25,24 @@ public class UtilsStaticTest extends BaseUnitTest {
     }
 
     @Test
+    public void testGetUserInitialsReturnsUserInitialsWhenPreferredNameHasExtraSpaces() {
+        PowerMockito.mockStatic(Utils.class);
+        Mockito.when(Utils.getPrefferedName()).thenReturn("IDRISA  JABIRI GEREMA");
+        Mockito.when(Utils.getUserInitials()).thenCallRealMethod();
+        String initials = Utils.getUserInitials();
+        Assert.assertEquals("IJ", initials);
+    }
+
+    @Test
+    public void testGetUserInitialsReturnsUserInitialsWhenPreferredNameHasSurroundingWhitespace() {
+        PowerMockito.mockStatic(Utils.class);
+        Mockito.when(Utils.getPrefferedName()).thenReturn("  Brian\tMwasi  ");
+        Mockito.when(Utils.getUserInitials()).thenCallRealMethod();
+        String initials = Utils.getUserInitials();
+        Assert.assertEquals("BM", initials);
+    }
+
+    @Test
     public void testGetUserInitialsReturnsUserInitialsGivenValidOnePreferredName() {
         PowerMockito.mockStatic(Utils.class);
         Mockito.when(Utils.getPrefferedName()).thenReturn("Brian");
